@@ -1,5 +1,6 @@
-package com.example.commonsecurity.auth;
+package com.example.commonsecurity.config;
 
+import com.example.commonsecurity.auth.SecurityHelper;
 import com.example.commonsecurity.auth.services.JwtService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
