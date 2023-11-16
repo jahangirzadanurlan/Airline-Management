@@ -1,10 +1,12 @@
 package com.example.userms.service;
 
+import com.example.userms.model.dto.request.AuthenticationRequest;
+import com.example.userms.model.dto.response.AuthenticationResponse;
 import com.example.userms.model.dto.response.UserRequestDto;
 
 public interface IUserService {
     String saveUser(UserRequestDto userRequestDto);
-    String authenticateUser(String username,String password);
+    AuthenticationResponse authenticateUser(AuthenticationRequest request);
     String renewPassword(String token);
     String resetsPassword(String newPassword,String repeatPassword);
     String refreshToken(String token,Long id);
