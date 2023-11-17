@@ -1,10 +1,11 @@
 package com.example.userms.service.impl;
 
+import com.example.commonsecurity.auth.SecurityHelper;
 import com.example.commonsecurity.auth.services.JwtService;
 import com.example.commonsecurity.model.RoleType;
 import com.example.userms.model.dto.request.AuthenticationRequest;
 import com.example.userms.model.dto.response.AuthenticationResponse;
-import com.example.userms.model.dto.response.UserRequestDto;
+import com.example.userms.model.dto.request.UserRequestDto;
 import com.example.userms.model.entity.Role;
 import com.example.userms.model.entity.User;
 import com.example.userms.model.enums.Constant;
@@ -16,6 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,12 +29,29 @@ import java.util.UUID;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class UserService implements IUserService {
+public class UserService implements UserDetailsService,IUserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final SecurityHelper securityHelper;
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findUserByUsernameOrEmail(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+
+        return org.springframework.security.core.userdetails.User
+                .withUsername(user.getUsername())
+                .password(user.getPassword())
+                .roles(user.getRole().getName().name())
+                .accountExpired(false)
+                .accountLocked(false)
+                .credentialsExpired(false)
+                .disabled(!user.isEnabled())
+                .build();
+    }
 
     @Override
     public String saveUser(UserRequestDto request) {
@@ -49,6 +70,7 @@ public class UserService implements IUserService {
         userRepository.save(user);
 
         confirmation(UUID.randomUUID().toString());
+        log.info("{} -> user created",request.getUsername());
         return Constant.SAVE_IS_SUCCESSFULLY.getMessage();
     }
 
@@ -62,18 +84,16 @@ public class UserService implements IUserService {
                     )
             );
         } catch (AuthenticationException e) {
-            log.error("Authentication failed: {}", e.getMessage());
+            log.error("Authentication failed: {}", e.getMessage());//Userin aktiv olub olmamağını haradan bilir?
             throw new RuntimeException(e);
         }
 
         Optional<User> user = userRepository.findUserByUsernameOrEmail(request.getUsername());
-        if (!user.get().isEnabled())      {
-            throw new RuntimeException("Account not active!");
-        }//
 
         String accessToken=jwtService.generateToken(user.orElseThrow());
         String refreshToken=jwtService.generateRefreshToken(user.orElseThrow());
 
+        log.info("{} -> user loging",request.getUsername());
         return AuthenticationResponse.builder()
                 .message(user.orElseThrow().getEmail() + " login is successfully")
                 .accessToken(accessToken)
@@ -92,8 +112,31 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public String refreshToken(String token, Long id) {
-        return null;
+    public AuthenticationResponse refreshToken(String token, Long id) {
+        if (!securityHelper.authHeaderIsValid(token)){
+            throw new RuntimeException("Token is wrong!");//
+        }
+
+        String jwt = token.substring(7);
+        String username = jwtService.extractUsername(jwt);
+        Optional<User> userById = userRepository.findUserById(id);
+
+        if (username != null){
+            if (userById.orElseThrow(() -> new RuntimeException(id + " id User not found!"))
+                    .getUsername().equals(username)){
+                if(jwtService.isTokenValid(jwt,userById.orElseThrow())){
+                    String accessToken=jwtService.generateToken(userById.get());
+                    String refreshToken=jwtService.generateRefreshToken(userById.get());
+
+                    log.info("{} token refreshing is successfully",username);
+                    return AuthenticationResponse.builder()
+                            .accessToken(accessToken)
+                            .refreshToken(refreshToken)
+                            .build();
+                }
+            }
+        }
+        throw new RuntimeException("Token is wrong!");
     }
 
     @Override

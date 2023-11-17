@@ -1,0 +1,5 @@
+rootProject.name = 'booking-ms'
+
+include 'common-security'
+
+project(':common-security').projectDir = new File(settingsDir, '../common-security')

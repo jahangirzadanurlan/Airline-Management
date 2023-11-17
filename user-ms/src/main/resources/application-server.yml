@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: user-ms
+server:
+  servlet:
+    context-path: /user
+  port: 8081

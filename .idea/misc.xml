@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="FrameworkDetectionExcludesConfiguration">
+    <file type="web" url="file://$PROJECT_DIR$/booking-ms" />
     <file type="web" url="file://$PROJECT_DIR$/common-email" />
     <file type="web" url="file://$PROJECT_DIR$/common-exception" />
     <file type="web" url="file://$PROJECT_DIR$/common-file-generator" />
@@ -9,7 +10,7 @@
     <file type="web" url="file://$PROJECT_DIR$/common-security" />
     <file type="web" url="file://$PROJECT_DIR$/user-ms" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="11" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_20" project-jdk-name="corretto-11" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>
 </project>

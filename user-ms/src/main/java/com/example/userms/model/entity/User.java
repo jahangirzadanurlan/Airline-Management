@@ -29,7 +29,8 @@ public class User implements UserDetails {
     LocalDate birthdate;
     String paspPin;
     String paspSeria;
-    boolean enabled;
+    @Builder.Default
+    boolean enabled = false;
 
     @ManyToOne
     @JoinColumn(name = "role_id")
