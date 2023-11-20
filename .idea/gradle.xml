@@ -19,6 +19,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/common-email" />
+            <option value="$PROJECT_DIR$/common-notification" />
           </set>
         </option>
       </GradleProjectSettings>
@@ -59,10 +60,23 @@
         </option>
       </GradleProjectSettings>
       <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/notification-ms" />
+        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/common-email" />
+            <option value="$PROJECT_DIR$/common-notification" />
+            <option value="$PROJECT_DIR$/notification-ms" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/user-ms" />
         <option name="gradleJvm" value="#JAVA_HOME" />
         <option name="modules">
           <set>
+            <option value="$PROJECT_DIR$/common-email" />
+            <option value="$PROJECT_DIR$/common-notification" />
             <option value="$PROJECT_DIR$/common-security" />
             <option value="$PROJECT_DIR$/user-ms" />
           </set>

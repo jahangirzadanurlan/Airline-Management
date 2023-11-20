@@ -1,5 +1,6 @@
 package com.example.userms.service.impl;
 
+import com.example.commonnotification.dto.request.ConfirmationRequest;
 import com.example.commonsecurity.auth.SecurityHelper;
 import com.example.commonsecurity.auth.services.JwtService;
 import com.example.commonsecurity.model.RoleType;
@@ -14,6 +15,7 @@ import com.example.userms.repository.UserRepository;
 import com.example.userms.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -36,6 +38,8 @@ public class UserService implements UserDetailsService,IUserService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final SecurityHelper securityHelper;
+    private final KafkaTemplate<String, ConfirmationRequest> kafkaTemplate;
+
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -69,7 +73,7 @@ public class UserService implements UserDetailsService,IUserService {
                 .build();
         userRepository.save(user);
 
-        confirmation(UUID.randomUUID().toString());
+        sendConfirmationLink(UUID.randomUUID().toString(),user);
         log.info("{} -> user created",request.getUsername());
         return Constant.SAVE_IS_SUCCESSFULLY.getMessage();
     }
@@ -140,10 +144,20 @@ public class UserService implements UserDetailsService,IUserService {
     }
 
     @Override
-    public String confirmation(String token) {
-        //Emaile link gonder
+    public void sendConfirmationLink(String token,User user) {
+        ConfirmationRequest request = ConfirmationRequest.builder()
+                .username(user.getUsername())
+                .email(user.getEmail())
+                .token(token)
+                .build();
+        kafkaTemplate.send("confirm-topic",request);
+    }
+
+    @Override
+    public String confirmAccount(String token) {
         return null;
     }
+
 
     @Override
     public String adminRegistration(UserRequestDto userRequestDto, String token, Long id) {

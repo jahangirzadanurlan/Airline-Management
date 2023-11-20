@@ -27,7 +27,14 @@ public class UserController {
     @GetMapping("/refresh-token")
     public ResponseEntity<AuthenticationResponse> refreshToken(@RequestHeader(name = "Authorization") String token,@RequestHeader(name = "UserId") Long id){
         return ResponseEntity.ok().body(userService.refreshToken(token,id));
+    }//Authorization problemi
+
+    @GetMapping("/auth/confirmation")
+    public ResponseEntity<AuthenticationResponse> confirmation(){
+        return null;
     }
+
+
 
 
 
