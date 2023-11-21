@@ -29,9 +29,9 @@ public class UserController {
         return ResponseEntity.ok().body(userService.refreshToken(token,id));
     }//Authorization problemi
 
-    @GetMapping("/auth/confirmation")
-    public ResponseEntity<AuthenticationResponse> confirmation(){
-        return null;
+    @GetMapping("/auth/confirmation/{token}")
+    public ResponseEntity<String> confirmation(@PathVariable String token){
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(userService.confirmAccount(token));
     }
 
 

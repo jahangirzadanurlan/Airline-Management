@@ -7,9 +7,11 @@ import com.example.commonsecurity.model.RoleType;
 import com.example.userms.model.dto.request.AuthenticationRequest;
 import com.example.userms.model.dto.response.AuthenticationResponse;
 import com.example.userms.model.dto.request.UserRequestDto;
+import com.example.userms.model.entity.ConfirmationToken;
 import com.example.userms.model.entity.Role;
 import com.example.userms.model.entity.User;
 import com.example.userms.model.enums.Constant;
+import com.example.userms.repository.ConfirmationTokenRepository;
 import com.example.userms.repository.RoleRepository;
 import com.example.userms.repository.UserRepository;
 import com.example.userms.service.IUserService;
@@ -25,6 +27,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,6 +35,7 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService,IUserService {
+    private final ConfirmationTokenRepository confirmationTokenRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -150,12 +154,30 @@ public class UserService implements UserDetailsService,IUserService {
                 .email(user.getEmail())
                 .token(token)
                 .build();
+        saveConfirmationToken(token, user);
         kafkaTemplate.send("confirm-topic",request);
+    }
+
+    private void saveConfirmationToken(String token, User user) {
+        ConfirmationToken confirmationToken = ConfirmationToken.builder()
+                .user(user)
+                .createdAt(LocalDateTime.now())
+                .token(token)
+                .build();
+        confirmationTokenRepository.save(confirmationToken);
     }
 
     @Override
     public String confirmAccount(String token) {
-        return null;
+        ConfirmationToken confirmationToken = confirmationTokenRepository.findConfirmationTokenByToken(token);
+        Optional<User> user = userRepository.findUserByUsernameOrEmail(confirmationToken.getUser().getUsername());
+        user.orElseThrow(() -> new RuntimeException("User not found!"))
+                .setEnabled(true);
+        confirmationToken.setConfirmedAt(LocalDateTime.now());
+
+        confirmationTokenRepository.save(confirmationToken);
+        userRepository.save(user.get());
+        return user.get().getUsername() + " your account has been activated!";
     }
 
 
