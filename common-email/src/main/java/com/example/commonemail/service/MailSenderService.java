@@ -12,7 +12,7 @@ import javax.mail.internet.MimeMessage;
 public class MailSenderService {
     private final JavaMailSender javaMailSender;
 
-    public void sendMail(ConfirmationRequest request) {
+    public void sendConfirmationMail(ConfirmationRequest request) {
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
 

@@ -17,6 +17,7 @@ public class SecurityConfig implements ApplicationSecurityConfigurer {
     @Override
     public void configure(HttpSecurity http) throws Exception {
                 log.info("Configuring role based access control user management");
+
                 http.authorizeRequests(authorizeRequests ->
                         authorizeRequests
                             .antMatchers(POST_USER_REGISTER).permitAll());
