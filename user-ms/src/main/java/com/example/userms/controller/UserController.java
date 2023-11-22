@@ -25,10 +25,10 @@ public class UserController {
         return ResponseEntity.ok().body(userService.authenticateUser(request));
     }
 
-    @GetMapping("/auth/refresh-token")
+    @GetMapping("/refresh-token")
     public ResponseEntity<AuthenticationResponse> refreshToken(@RequestHeader(name = "Authorization") String token,@RequestHeader(name = "UserId") Long id){
         return ResponseEntity.ok().body(userService.refreshToken(token,id));
-    }//Authorization problemi
+    }
 
     @GetMapping("/auth/confirmation/{token}")
     public ResponseEntity<String> confirmation(@PathVariable String token){

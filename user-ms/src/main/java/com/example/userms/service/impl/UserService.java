@@ -63,7 +63,7 @@ public class UserService implements UserDetailsService,IUserService {
     public String saveUser(UserRequestDto request) {
         Role role = roleRepository.findRoleByName(RoleType.USER)
                 .orElseThrow(() -> new RuntimeException("Role not found!"));
-        saveUserToDatabase(request, role);
+        saveUserToDatabase(request, role,"confirm-topic");
         log.info("{} -> user created",request.getUsername());
         return Constant.SAVE_IS_SUCCESSFULLY.getMessage();
     }
@@ -72,12 +72,12 @@ public class UserService implements UserDetailsService,IUserService {
     public String saveAdmin(UserRequestDto request) {
         Role role = roleRepository.findRoleByName(RoleType.ADMIN)
                 .orElseThrow(() -> new RuntimeException("Role not found!"));
-        saveUserToDatabase(request, role);
+        saveUserToDatabase(request, role,"set-psw-topic");
         log.info("{} -> admin created",request.getUsername());
         return Constant.SAVE_IS_SUCCESSFULLY.getMessage();
     }
 
-    private void saveUserToDatabase(UserRequestDto request, Role role) {
+    private void saveUserToDatabase(UserRequestDto request, Role role,String topicName) {
         User user = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -90,7 +90,7 @@ public class UserService implements UserDetailsService,IUserService {
                 .build();
         userRepository.save(user);
 
-        sendConfirmationLink(UUID.randomUUID().toString(),user);
+        sendConfirmationLink(UUID.randomUUID().toString(),user,topicName);
     }
 
     @Override
@@ -149,24 +149,29 @@ public class UserService implements UserDetailsService,IUserService {
 
                     log.info("{} token refreshing is successfully",username);
                     return AuthenticationResponse.builder()
+                            .message("Refreshingg is successfully!")
                             .accessToken(accessToken)
                             .refreshToken(refreshToken)
                             .build();
                 }
+            }else {
+                throw new RuntimeException("UserId is wrong!");
             }
+        }else {
+            throw new RuntimeException("Token Username is null!");
         }
-        throw new RuntimeException("Token is wrong!");
+        return null;
     }
 
     @Override
-    public void sendConfirmationLink(String token,User user) {
+    public void sendConfirmationLink(String token,User user,String topicName) {
         ConfirmationRequest request = ConfirmationRequest.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .token(token)
                 .build();
         saveConfirmationToken(token, user);
-        kafkaTemplate.send("confirm-topic",request);
+        kafkaTemplate.send(topicName,request);
     }
 
     private void saveConfirmationToken(String token, User user) {
@@ -187,7 +192,7 @@ public class UserService implements UserDetailsService,IUserService {
     @Override
     public String setPasswordForAdminAccount(AdminNewPasswordRequestDto requestDto){
         if (requestDto.getNewPassword().equals(requestDto.getRepeatPassword())){
-            enableUserAccount(requestDto.getToken());
+            enableAdminAccount(requestDto.getToken(),requestDto.getNewPassword());
             return "Your account has been activated!";
         }else {
             throw new RuntimeException("Passwords not equals");
@@ -199,6 +204,18 @@ public class UserService implements UserDetailsService,IUserService {
         Optional<User> user = userRepository.findUserByUsernameOrEmail(confirmationToken.getUser().getUsername());
         user.orElseThrow(() -> new RuntimeException("User not found!"))
                 .setEnabled(true);
+        confirmationToken.setConfirmedAt(LocalDateTime.now());
+
+        confirmationTokenRepository.save(confirmationToken);
+        userRepository.save(user.get());
+    }
+
+    private void enableAdminAccount(String token,String password) {
+        ConfirmationToken confirmationToken = confirmationTokenRepository.findConfirmationTokenByToken(token);
+        Optional<User> user = userRepository.findUserByUsernameOrEmail(confirmationToken.getUser().getUsername());
+        user.orElseThrow(() -> new RuntimeException("User not found!"))
+                .setEnabled(true);
+        user.get().setPassword(passwordEncoder.encode(password));
         confirmationToken.setConfirmedAt(LocalDateTime.now());
 
         confirmationTokenRepository.save(confirmationToken);

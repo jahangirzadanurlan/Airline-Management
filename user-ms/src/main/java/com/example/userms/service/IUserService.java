@@ -15,7 +15,7 @@ public interface IUserService {
     String renewPassword(String token);
     String resetsPassword(String newPassword,String repeatPassword);
     AuthenticationResponse refreshToken(String token,Long id);
-    void sendConfirmationLink(String token, User user);
+    void sendConfirmationLink(String token, User user,String topicName);
     String confirmAccount(String token);
 }
 
