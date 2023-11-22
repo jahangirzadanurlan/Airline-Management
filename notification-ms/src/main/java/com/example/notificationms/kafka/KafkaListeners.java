@@ -14,8 +14,14 @@ public class KafkaListeners {
     private final MailSenderService mailSenderService;
     @KafkaListener(topics = "confirm-topic",groupId = "groupId")
     void UserConfirmationListener(ConfirmationRequest request) {
-        log.info("Consumer ise dusdu");
+        log.info("confirm-topic Consumer ise dusdu -> {}",request.getUsername());
         mailSenderService.sendConfirmationMail(request);
+    }
+
+    @KafkaListener(topics = "set-psw-topic",groupId = "groupId")
+    void AdminConfirmationListener(ConfirmationRequest request) {
+        log.info("set-psw-topic Consumer ise dusdu -> {}",request.getUsername());
+        mailSenderService.sendAdminConfirmationMail(request);
     }
 }
 

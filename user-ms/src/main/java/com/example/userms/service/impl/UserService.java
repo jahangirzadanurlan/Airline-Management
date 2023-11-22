@@ -4,6 +4,7 @@ import com.example.commonnotification.dto.request.ConfirmationRequest;
 import com.example.commonsecurity.auth.SecurityHelper;
 import com.example.commonsecurity.auth.services.JwtService;
 import com.example.commonsecurity.model.RoleType;
+import com.example.userms.model.dto.request.AdminNewPasswordRequestDto;
 import com.example.userms.model.dto.request.AuthenticationRequest;
 import com.example.userms.model.dto.response.AuthenticationResponse;
 import com.example.userms.model.dto.request.UserRequestDto;
@@ -21,6 +22,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,6 +30,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -47,24 +50,34 @@ public class UserService implements UserDetailsService,IUserService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findUserByUsernameOrEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        Optional<User> user = userRepository.findUserByUsernameOrEmail(username);
 
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getUsername())
-                .password(user.getPassword())
-                .roles(user.getRole().getName().name())
-                .accountExpired(false)
-                .accountLocked(false)
-                .credentialsExpired(false)
-                .disabled(!user.isEnabled())
-                .build();
+        return new org.springframework.security.core.userdetails.User(
+                user.orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username))
+                        .getUsername(),
+                user.get().getPassword(),
+                Collections.singleton(new SimpleGrantedAuthority(user.get().getRole().getName().name())));
     }
 
     @Override
     public String saveUser(UserRequestDto request) {
         Role role = roleRepository.findRoleByName(RoleType.USER)
                 .orElseThrow(() -> new RuntimeException("Role not found!"));
+        saveUserToDatabase(request, role);
+        log.info("{} -> user created",request.getUsername());
+        return Constant.SAVE_IS_SUCCESSFULLY.getMessage();
+    }
+
+    @Override
+    public String saveAdmin(UserRequestDto request) {
+        Role role = roleRepository.findRoleByName(RoleType.ADMIN)
+                .orElseThrow(() -> new RuntimeException("Role not found!"));
+        saveUserToDatabase(request, role);
+        log.info("{} -> admin created",request.getUsername());
+        return Constant.SAVE_IS_SUCCESSFULLY.getMessage();
+    }
+
+    private void saveUserToDatabase(UserRequestDto request, Role role) {
         User user = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -78,8 +91,6 @@ public class UserService implements UserDetailsService,IUserService {
         userRepository.save(user);
 
         sendConfirmationLink(UUID.randomUUID().toString(),user);
-        log.info("{} -> user created",request.getUsername());
-        return Constant.SAVE_IS_SUCCESSFULLY.getMessage();
     }
 
     @Override
@@ -169,6 +180,21 @@ public class UserService implements UserDetailsService,IUserService {
 
     @Override
     public String confirmAccount(String token) {
+        enableUserAccount(token);
+        return "Your account has been activated!";
+    }
+
+    @Override
+    public String setPasswordForAdminAccount(AdminNewPasswordRequestDto requestDto){
+        if (requestDto.getNewPassword().equals(requestDto.getRepeatPassword())){
+            enableUserAccount(requestDto.getToken());
+            return "Your account has been activated!";
+        }else {
+            throw new RuntimeException("Passwords not equals");
+        }
+    }
+
+    private void enableUserAccount(String token) {
         ConfirmationToken confirmationToken = confirmationTokenRepository.findConfirmationTokenByToken(token);
         Optional<User> user = userRepository.findUserByUsernameOrEmail(confirmationToken.getUser().getUsername());
         user.orElseThrow(() -> new RuntimeException("User not found!"))
@@ -177,12 +203,15 @@ public class UserService implements UserDetailsService,IUserService {
 
         confirmationTokenRepository.save(confirmationToken);
         userRepository.save(user.get());
-        return user.get().getUsername() + " your account has been activated!";
     }
 
-
     @Override
-    public String adminRegistration(UserRequestDto userRequestDto, String token, Long id) {
-        return null;
+    public String passwordSetPage(String token) {
+        ConfirmationToken confirmationToken = confirmationTokenRepository.findConfirmationTokenByToken(token);
+        Optional<User> user = userRepository.findUserByUsernameOrEmail(confirmationToken.getUser().getUsername());
+        user.orElseThrow(() -> new RuntimeException("User not found!"))
+                .setEnabled(true);
+
+        return user.get().getUsername() + " plese send POST request to '/auth/set-password' link!";
     }
 }

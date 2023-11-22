@@ -16,7 +16,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @RequiredArgsConstructor
 public class BaseSecurityConfig extends WebSecurityConfigurerAdapter {
-    private final JwtAuthFilter jwtAuthFilter;
     private final ApplicationSecurityConfigurer applicationSecurityConfigurer;
 
     @Override
@@ -30,7 +29,7 @@ public class BaseSecurityConfig extends WebSecurityConfigurerAdapter {
                 )
                 .authorizeRequests().anyRequest().authenticated();
 
-        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
     }
 
     @Bean

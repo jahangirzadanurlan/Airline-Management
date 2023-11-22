@@ -14,4 +14,12 @@ public class TopicConfig {
                 .replicas(1)
                 .build();
     }
+
+    @Bean
+    public NewTopic secondTopic(){
+        return TopicBuilder.name("set-psw-topic")
+                .partitions(3)
+                .replicas(1)
+                .build();
+    }
 }

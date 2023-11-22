@@ -32,4 +32,25 @@ public class MailSenderService {
 
         javaMailSender.send(message);
     }
+
+    public void sendAdminConfirmationMail(ConfirmationRequest request) {
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
+
+        try {
+            helper.setTo(request.getEmail());
+            helper.setSubject("Set password!");
+            String setPasswordLink = "http://localhost:8081/user/auth/set-password/" + request.getToken();
+            String emailContent = "<html><body><p>Please click the following link to set password for your account:</p>"
+                    + "<a href=\"" + setPasswordLink + "\">Confirm Account</a>"
+                    + "</body></html>";
+
+            helper.setText(emailContent, true);
+
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+
+        javaMailSender.send(message);
+    }
 }
