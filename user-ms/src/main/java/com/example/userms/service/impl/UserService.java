@@ -6,6 +6,7 @@ import com.example.commonsecurity.auth.services.JwtService;
 import com.example.commonsecurity.model.RoleType;
 import com.example.userms.model.dto.request.AdminNewPasswordRequestDto;
 import com.example.userms.model.dto.request.AuthenticationRequest;
+import com.example.userms.model.dto.request.PasswodRequestDto;
 import com.example.userms.model.dto.response.AuthenticationResponse;
 import com.example.userms.model.dto.request.UserRequestDto;
 import com.example.userms.model.entity.ConfirmationToken;
@@ -18,6 +19,8 @@ import com.example.userms.repository.UserRepository;
 import com.example.userms.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -126,8 +129,41 @@ public class UserService implements UserDetailsService,IUserService {
     }
 
     @Override
-    public String resetsPassword(String newPassword, String repeatPassword) {
-        return null;
+    public ResponseEntity<String> resetsPassword(String token, PasswodRequestDto passwodRequestDto) {
+        if (passwodRequestDto.getNewPassword().equals(passwodRequestDto.getRepeatPassword())){
+            extractUserAndSetPassword(token, passwodRequestDto);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body("Password changing is successfully!");
+        }else {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Password changing is not successfully!");
+        }
+    }
+
+    private void extractUserAndSetPassword(String token, PasswodRequestDto passwodRequestDto) {
+        securityHelper.authHeaderIsValid(token);
+        String jwt = token.substring(7);
+        if (!jwtService.isTokenExpired(jwt)){
+            String username = jwtService.extractUsername(jwt);
+            Optional<User> user = userRepository.findUserByUsernameOrEmail(username);
+            user.orElseThrow(() -> new RuntimeException("User not Found!"))
+                    .setPassword(passwordEncoder.encode(passwodRequestDto.getNewPassword()));
+            userRepository.save(user.get());
+        }
+    }
+
+    @Override
+    public ResponseEntity<String> checkEmailInDatabase(String email){
+        log.info("email -> {}",email);
+        Optional<User> user = userRepository.findUserByUsernameOrEmail(email);
+        log.info("User email -> {}",user.orElseThrow(() -> new RuntimeException("User not found")).getEmail());
+        if (user.isPresent()){
+            ConfirmationRequest confirmationRequest = ConfirmationRequest.builder()
+                    .email(user.get().getEmail())
+                    .build();
+            kafkaTemplate.send("email-topic",confirmationRequest);
+            return ResponseEntity.ok().body("We send link to your email for password changing");
+        }else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("This email not registered!");
+        }
     }
 
     @Override

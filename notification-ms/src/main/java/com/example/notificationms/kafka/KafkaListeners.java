@@ -18,6 +18,18 @@ public class KafkaListeners {
         mailSenderService.sendConfirmationMail(request);
     }
 
+    @KafkaListener(topics = "email-topic",groupId = "groupId")
+    void passwordResetMailSendingListener(ConfirmationRequest request) {
+        log.info("email-topic Consumer ise dusdu -> {}",request.getEmail());
+
+        String setPasswordLink = "http://localhost:8081/user/auth/reset-password/page";
+        String emailContent = "<html><body><p>Please click the following link to reset password for your account:</p>"
+                + "<a href=\"" + setPasswordLink + "\">Confirm Account</a>"
+                + "</body></html>";
+
+        mailSenderService.sendMail("Reset Password!",emailContent, request.getEmail());
+    }
+
     @KafkaListener(topics = "set-psw-topic",groupId = "groupId")
     void AdminConfirmationListener(ConfirmationRequest request) {
         log.info("set-psw-topic Consumer ise dusdu -> {}",request.getUsername());

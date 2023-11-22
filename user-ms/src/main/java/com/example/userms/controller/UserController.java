@@ -2,6 +2,7 @@ package com.example.userms.controller;
 
 import com.example.userms.model.dto.request.AdminNewPasswordRequestDto;
 import com.example.userms.model.dto.request.AuthenticationRequest;
+import com.example.userms.model.dto.request.PasswodRequestDto;
 import com.example.userms.model.dto.response.AuthenticationResponse;
 import com.example.userms.model.dto.request.UserRequestDto;
 import com.example.userms.service.IUserService;
@@ -35,8 +36,23 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(userService.confirmAccount(token));
     }
 
+    @PostMapping("/auth/reset-password/check-email")
+    public ResponseEntity<String> checkEmail(@RequestBody String email){
+        return userService.checkEmailInDatabase(email);
+    }
+
+    @GetMapping("/auth/reset-password/page")
+    public ResponseEntity<String> resetPasswordPage(){
+        return ResponseEntity.ok().body("Please POST /auth/resets-password with required Request body!");
+    }
+
+    @PostMapping("/auth/resets-password")
+    public ResponseEntity<String> resetsPassword(@RequestHeader String token, @RequestBody PasswodRequestDto passwodRequestDto){
+        return userService.resetsPassword(token,passwodRequestDto);
+    }
+
     @GetMapping("/auth/set-password/{token}")
-    public ResponseEntity<String> setPasswordPage(@PathVariable String token){
+    public ResponseEntity<String> setAdminPasswordPage(@PathVariable String token){
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(userService.passwordSetPage(token));
     }
 

@@ -53,4 +53,20 @@ public class MailSenderService {
 
         javaMailSender.send(message);
     }
+
+    public void sendMail(String subject,String emailContent,String email) {
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
+
+        try {
+            helper.setTo(email);
+            helper.setSubject(subject);
+            helper.setText(emailContent, true);
+        } catch (MessagingException e) {
+            throw new RuntimeException(e);
+        }
+
+        javaMailSender.send(message);
+    }
+
 }

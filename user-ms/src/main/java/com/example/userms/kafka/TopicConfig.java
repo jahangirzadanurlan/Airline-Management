@@ -22,4 +22,12 @@ public class TopicConfig {
                 .replicas(1)
                 .build();
     }
+
+    @Bean
+    public NewTopic thirdTopic(){
+        return TopicBuilder.name("email-topic")
+                .partitions(3)
+                .replicas(1)
+                .build();
+    }
 }
