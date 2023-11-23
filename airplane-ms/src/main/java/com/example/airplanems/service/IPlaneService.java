@@ -9,11 +9,11 @@ import java.util.List;
 
 public interface IPlaneService {
     ResponseEntity<String> addPlane(PlaneRequestDto requestDto);
-    List<PlaneResponseDto> getAllPlanes();
-    PlaneResponseDto getPlaneById(Long id);
+    List<Plane> getAllPlanes();
+    Plane getPlaneById(Long id);
     ResponseEntity<String> updatePlane(Plane plane);
     ResponseEntity<String> deletePlane(Long id);
-    ResponseEntity<String> patchPlane(Long id);
+    ResponseEntity<String> patchPlane(Long id,String isBusy);
 
 
 }

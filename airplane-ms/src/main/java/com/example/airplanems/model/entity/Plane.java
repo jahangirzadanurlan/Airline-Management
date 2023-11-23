@@ -9,6 +9,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -19,6 +20,7 @@ public class Plane {
     String name;
     int masSeats;
     int maxSpeed;
+    boolean isBusy;
 }
 
 
