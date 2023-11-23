@@ -18,6 +18,12 @@ public class KafkaListeners {
         mailSenderService.sendConfirmationMail(request);
     }
 
+    @KafkaListener(topics = "set-psw-topic",groupId = "groupId")
+    void AdminConfirmationListener(ConfirmationRequest request) {
+        log.info("set-psw-topic Consumer ise dusdu -> {}",request.getUsername());
+        mailSenderService.sendAdminConfirmationMail(request);
+    }
+
     @KafkaListener(topics = "email-topic",groupId = "groupId")
     void passwordResetMailSendingListener(ConfirmationRequest request) {
         log.info("email-topic Consumer ise dusdu -> {}",request.getEmail());
@@ -30,10 +36,20 @@ public class KafkaListeners {
         mailSenderService.sendMail("Reset Password!",emailContent, request.getEmail());
     }
 
-    @KafkaListener(topics = "set-psw-topic",groupId = "groupId")
-    void AdminConfirmationListener(ConfirmationRequest request) {
-        log.info("set-psw-topic Consumer ise dusdu -> {}",request.getUsername());
-        mailSenderService.sendAdminConfirmationMail(request);
+    @KafkaListener(topics = "otp-topic",groupId = "groupId")
+    void otpMailSendingListener(ConfirmationRequest request) {
+        String otp = request.getToken();
+        log.info("otp-topic Consumer ise dusdu -> {}",request.getEmail());
+
+        String emailContent = "<html><body><p>Please " + otp + " </p>"
+                + "</body></html>";
+
+        mailSenderService.sendMail("Renew Password!",emailContent, request.getEmail());
     }
+
+
+
+
+
 }
 

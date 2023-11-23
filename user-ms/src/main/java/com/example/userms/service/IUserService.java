@@ -14,7 +14,8 @@ public interface IUserService {
     AuthenticationResponse authenticateUser(AuthenticationRequest request);
     String passwordSetPage(String token);
     String setPasswordForAdminAccount(AdminNewPasswordRequestDto requestDto);
-    String renewPassword(String token);
+    ResponseEntity<String> sendOTP(String token);
+    ResponseEntity<String> checkOtp(String username,String otp);
     ResponseEntity<String> checkEmailInDatabase(String email);
     ResponseEntity<String> resetsPassword(String token, PasswodRequestDto passwodRequestDto);
     AuthenticationResponse refreshToken(String token,Long id);

@@ -36,6 +36,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(userService.confirmAccount(token));
     }
 
+    //-----Reset Password------
     @PostMapping("/auth/reset-password/check-email")
     public ResponseEntity<String> checkEmail(@RequestBody String email){
         return userService.checkEmailInDatabase(email);
@@ -50,6 +51,20 @@ public class UserController {
     public ResponseEntity<String> resetsPassword(@RequestHeader String token, @RequestBody PasswodRequestDto passwodRequestDto){
         return userService.resetsPassword(token,passwodRequestDto);
     }
+    //---------------------------
+
+    //-----Renew Password------
+    @PostMapping("/auth/send-otp")
+    public ResponseEntity<String> sendOtpMail(@RequestHeader String token){
+        return userService.sendOTP(token);
+    }
+
+    @PostMapping("/auth/check-otp/{username}")
+    public ResponseEntity<String> checkOtp(@PathVariable String username,@RequestBody String otp){
+        return userService.checkOtp(username,otp);
+    }
+
+    //----------------------------
 
     @GetMapping("/auth/set-password/{token}")
     public ResponseEntity<String> setAdminPasswordPage(@PathVariable String token){

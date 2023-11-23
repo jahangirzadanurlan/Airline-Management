@@ -35,6 +35,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -123,10 +124,56 @@ public class UserService implements UserDetailsService,IUserService {
                 .build();
     }
 
+    //-----Renew Password------
     @Override
-    public String renewPassword(String token) {
-        return null;
+    public ResponseEntity<String> sendOTP(String token) {
+        securityHelper.authHeaderIsValid(token);
+        String jwt = token.substring(7);
+        if (!jwtService.isTokenExpired(jwt)) {
+            String username = jwtService.extractUsername(jwt);
+            Optional<User> user = userRepository.findUserByUsernameOrEmail(username);
+            String otp = createAndSaveOtp(user);
+
+            ConfirmationRequest confirmationRequest = ConfirmationRequest.builder()
+                    .email(user.orElseThrow(() -> new RuntimeException("Token not found!")).getEmail())
+                    .token(otp)
+                    .build();
+            kafkaTemplate.send("otp-topic",confirmationRequest);
+            return ResponseEntity.ok().body("We are send OTP to " + user.get().getEmail());
+        }else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token expired!");
+        }
     }
+
+    private String createAndSaveOtp(Optional<User> user) {
+        Random random = new Random();
+        String otp = String.valueOf(random.nextInt(9000) + 1000);
+
+        ConfirmationToken confirmationToken = ConfirmationToken.builder()
+                .token(otp)
+                .user(user.orElseThrow(() -> new RuntimeException("User not found!")))
+                .createdAt(LocalDateTime.now())
+                .build();
+        confirmationTokenRepository.save(confirmationToken);
+        return otp;
+    }
+
+    @Override
+    public ResponseEntity<String> checkOtp(String username,String otp) {
+        Optional<User> user = userRepository.findUserByUsernameOrEmail(username);
+        if (user.isEmpty()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username not found!");
+        }
+
+        Optional<ConfirmationToken> confirmationToken = confirmationTokenRepository.findConfirmationTokenByToken(otp);
+        if (confirmationToken.isPresent()){
+            return ResponseEntity.ok().body("Otp is true");
+        }else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Otp is wrong");
+        }
+    }
+
+    //----------------------------
 
     @Override
     public ResponseEntity<String> resetsPassword(String token, PasswodRequestDto passwodRequestDto) {
@@ -154,7 +201,6 @@ public class UserService implements UserDetailsService,IUserService {
     public ResponseEntity<String> checkEmailInDatabase(String email){
         log.info("email -> {}",email);
         Optional<User> user = userRepository.findUserByUsernameOrEmail(email);
-        log.info("User email -> {}",user.orElseThrow(() -> new RuntimeException("User not found")).getEmail());
         if (user.isPresent()){
             ConfirmationRequest confirmationRequest = ConfirmationRequest.builder()
                     .email(user.get().getEmail())
@@ -236,32 +282,35 @@ public class UserService implements UserDetailsService,IUserService {
     }
 
     private void enableUserAccount(String token) {
-        ConfirmationToken confirmationToken = confirmationTokenRepository.findConfirmationTokenByToken(token);
-        Optional<User> user = userRepository.findUserByUsernameOrEmail(confirmationToken.getUser().getUsername());
+        Optional<ConfirmationToken> confirmationToken = confirmationTokenRepository.findConfirmationTokenByToken(token);
+        Optional<User> user = userRepository.findUserByUsernameOrEmail(confirmationToken.orElseThrow(() -> new RuntimeException("Token not found!"))
+                                                                                .getUser().getUsername());
         user.orElseThrow(() -> new RuntimeException("User not found!"))
                 .setEnabled(true);
-        confirmationToken.setConfirmedAt(LocalDateTime.now());
+        confirmationToken.get().setConfirmedAt(LocalDateTime.now());
 
-        confirmationTokenRepository.save(confirmationToken);
+        confirmationTokenRepository.save(confirmationToken.get());
         userRepository.save(user.get());
     }
 
     private void enableAdminAccount(String token,String password) {
-        ConfirmationToken confirmationToken = confirmationTokenRepository.findConfirmationTokenByToken(token);
-        Optional<User> user = userRepository.findUserByUsernameOrEmail(confirmationToken.getUser().getUsername());
+        Optional<ConfirmationToken> confirmationToken = confirmationTokenRepository.findConfirmationTokenByToken(token);
+        Optional<User> user = userRepository.findUserByUsernameOrEmail(confirmationToken.orElseThrow(() -> new RuntimeException("Token not found!"))
+                                                                            .getUser().getUsername());
         user.orElseThrow(() -> new RuntimeException("User not found!"))
                 .setEnabled(true);
         user.get().setPassword(passwordEncoder.encode(password));
-        confirmationToken.setConfirmedAt(LocalDateTime.now());
+        confirmationToken.get().setConfirmedAt(LocalDateTime.now());
 
-        confirmationTokenRepository.save(confirmationToken);
+        confirmationTokenRepository.save(confirmationToken.get());
         userRepository.save(user.get());
     }
 
     @Override
     public String passwordSetPage(String token) {
-        ConfirmationToken confirmationToken = confirmationTokenRepository.findConfirmationTokenByToken(token);
-        Optional<User> user = userRepository.findUserByUsernameOrEmail(confirmationToken.getUser().getUsername());
+        Optional<ConfirmationToken> confirmationToken = confirmationTokenRepository.findConfirmationTokenByToken(token);
+        Optional<User> user = userRepository.findUserByUsernameOrEmail(confirmationToken.orElseThrow(() -> new RuntimeException("Token not found!"))
+                                                                            .getUser().getUsername());
         user.orElseThrow(() -> new RuntimeException("User not found!"))
                 .setEnabled(true);
 
