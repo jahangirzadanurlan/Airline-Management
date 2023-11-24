@@ -26,7 +26,7 @@ public class PlaneController {
     }
 
     @DeleteMapping("/airplanes/{id}")
-    public ResponseEntity<String> updatePlane(@PathVariable Long id){
+    public ResponseEntity<String> deletePlane(@PathVariable Long id){
         return planeService.deletePlane(id);
     }
 
