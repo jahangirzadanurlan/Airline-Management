@@ -1,4 +1,4 @@
-package com.example.userms.kafka;
+package com.example.bookingms.kafka;
 
 import com.example.commonnotification.dto.request.KafkaRequest;
 import org.apache.kafka.clients.producer.ProducerConfig;

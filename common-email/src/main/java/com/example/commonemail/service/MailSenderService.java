@@ -1,7 +1,8 @@
 package com.example.commonemail.service;
 
-import com.example.commonnotification.dto.request.ConfirmationRequest;
+import com.example.commonnotification.dto.request.KafkaRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
@@ -12,7 +13,7 @@ import javax.mail.internet.MimeMessage;
 public class MailSenderService {
     private final JavaMailSender javaMailSender;
 
-    public void sendConfirmationMail(ConfirmationRequest request) {
+    public void sendConfirmationMail(KafkaRequest request) {
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
 
@@ -33,7 +34,7 @@ public class MailSenderService {
         javaMailSender.send(message);
     }
 
-    public void sendAdminConfirmationMail(ConfirmationRequest request) {
+    public void sendAdminConfirmationMail(KafkaRequest request) {
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, "utf-8");
 
@@ -65,6 +66,22 @@ public class MailSenderService {
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
+
+        javaMailSender.send(message);
+    }
+
+    public void sendEmailWithAttachment(String toEmail, String subject, String body, byte[] attachment, String attachmentName)
+            throws MessagingException {
+
+        MimeMessage message = javaMailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        helper.setTo(toEmail);
+        helper.setSubject(subject);
+        helper.setText(body);
+
+        // PDF dosyasını ek olarak ekleyin
+        helper.addAttachment(attachmentName, new ByteArrayResource(attachment));
 
         javaMailSender.send(message);
     }

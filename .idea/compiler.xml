@@ -5,12 +5,17 @@
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$PROJECT_DIR$/../.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.30/f195ee86e6c896ea47a1d39defbe20eb59cd149d/lombok-1.18.30.jar" />
+          <entry name="$PROJECT_DIR$/../.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.28/a2ff5da8bcd8b1b26f36b806ced63213362c6dcc/lombok-1.18.28.jar" />
         </processorPath>
-        <module name="flight-ms.main" />
+        <module name="notification-ms.common-notification.main" />
+        <module name="notification-ms.main" />
+        <module name="notification-ms.common-email.main" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="booking-ms.common-security" target="11" />
+      <module name="booking-ms.common-security.main" target="11" />
+      <module name="booking-ms.common-security.test" target="11" />
       <module name="notificationn-ms" target="11" />
     </bytecodeTargetLevel>
   </component>

@@ -1,20 +1,23 @@
-package com.example.flightms.model.dto.response;
+package com.example.bookingms.model.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
 
-@Builder
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
+@Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class FlightResponseDto {
+public class TicketResponseDto {
     Long id;
-    Long fromAirlineId;
-    Long toAirlineId;
+    String firstName;
+    String lastName;
+    String fromAirline;
+    String toAirline;
     LocalDateTime departureDateTime;
     LocalDateTime arrivalDateTime;
-    public static double initialPrice;
+    double price;
+    Long flightId;
 }

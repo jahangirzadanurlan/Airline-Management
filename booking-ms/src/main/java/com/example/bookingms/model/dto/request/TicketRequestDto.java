@@ -1,16 +1,15 @@
-package com.example.commonnotification.dto.request;
+package com.example.bookingms.model.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ConfirmationRequest {
-    String username;
+public class TicketRequestDto {
+    String firstName;
+    String lastName;
     String email;
-    String token;
 }
-

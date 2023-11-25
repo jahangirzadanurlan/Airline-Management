@@ -5,7 +5,8 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/airline-management.iml" filepath="$PROJECT_DIR$/.idea/airline-management.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1080498532/airplane-ms.common-security.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-1080498532/airplane-ms.common-security.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/airplane-ms.main.iml" filepath="$PROJECT_DIR$/.idea/modules/airplane-ms.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1080498532/booking-ms.common-security.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-1080498532/booking-ms.common-security.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1764394560/booking-ms.common-email.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-1764394560/booking-ms.common-email.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-658380217/booking-ms.common-notification.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-658380217/booking-ms.common-notification.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/booking-ms.main.iml" filepath="$PROJECT_DIR$/.idea/modules/booking-ms.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/-658380217/common-email.common-notification.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-658380217/common-email.common-notification.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/common-email.main.iml" filepath="$PROJECT_DIR$/.idea/modules/common-email.main.iml" />

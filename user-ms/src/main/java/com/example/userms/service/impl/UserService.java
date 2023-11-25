@@ -1,6 +1,6 @@
 package com.example.userms.service.impl;
 
-import com.example.commonnotification.dto.request.ConfirmationRequest;
+import com.example.commonnotification.dto.request.KafkaRequest;
 import com.example.commonsecurity.auth.SecurityHelper;
 import com.example.commonsecurity.auth.services.JwtService;
 import com.example.commonsecurity.model.RoleType;
@@ -49,7 +49,7 @@ public class UserService implements UserDetailsService,IUserService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final SecurityHelper securityHelper;
-    private final KafkaTemplate<String, ConfirmationRequest> kafkaTemplate;
+    private final KafkaTemplate<String, KafkaRequest> kafkaTemplate;
 
 
     @Override
@@ -134,11 +134,11 @@ public class UserService implements UserDetailsService,IUserService {
             Optional<User> user = userRepository.findUserByUsernameOrEmail(username);
             String otp = createAndSaveOtp(user);
 
-            ConfirmationRequest confirmationRequest = ConfirmationRequest.builder()
+            KafkaRequest kafkaRequest = KafkaRequest.builder()
                     .email(user.orElseThrow(() -> new RuntimeException("Token not found!")).getEmail())
                     .token(otp)
                     .build();
-            kafkaTemplate.send("otp-topic",confirmationRequest);
+            kafkaTemplate.send("otp-topic",kafkaRequest);
             return ResponseEntity.ok().body("We are send OTP to " + user.get().getEmail());
         }else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token expired!");
@@ -202,10 +202,10 @@ public class UserService implements UserDetailsService,IUserService {
         log.info("email -> {}",email);
         Optional<User> user = userRepository.findUserByUsernameOrEmail(email);
         if (user.isPresent()){
-            ConfirmationRequest confirmationRequest = ConfirmationRequest.builder()
+            KafkaRequest kafkaRequest = KafkaRequest.builder()
                     .email(user.get().getEmail())
                     .build();
-            kafkaTemplate.send("email-topic",confirmationRequest);
+            kafkaTemplate.send("email-topic",kafkaRequest);
             return ResponseEntity.ok().body("We send link to your email for password changing");
         }else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("This email not registered!");
@@ -247,7 +247,7 @@ public class UserService implements UserDetailsService,IUserService {
 
     @Override
     public void sendConfirmationLink(String token,User user,String topicName) {
-        ConfirmationRequest request = ConfirmationRequest.builder()
+        KafkaRequest request = KafkaRequest.builder()
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .token(token)

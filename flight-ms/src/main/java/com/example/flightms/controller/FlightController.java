@@ -11,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/flight")
 public class FlightController {
     private final IFlightService flightService;
 

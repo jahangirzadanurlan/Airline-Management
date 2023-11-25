@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: flight-ms
+server:
+  servlet:
+    context-path: /flight
+  port: 8085

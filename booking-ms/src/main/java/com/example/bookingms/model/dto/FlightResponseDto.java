@@ -1,4 +1,4 @@
-package com.example.flightms.model.dto.response;
+package com.example.bookingms.model.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -16,5 +16,5 @@ public class FlightResponseDto {
     Long toAirlineId;
     LocalDateTime departureDateTime;
     LocalDateTime arrivalDateTime;
-    public static double initialPrice;
+    double initialPrice;
 }
