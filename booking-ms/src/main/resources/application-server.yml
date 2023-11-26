@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: booking-ms
+server:
+  servlet:
+    context-path: /booking
+  port: 8086

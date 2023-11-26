@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TicketController {
     private final ITicketService ticketService;
 
-    @PostMapping("/booking/tickets/{flightId}")
+    @PostMapping("/tickets/{flightId}")
     public ResponseEntity<String> buyTicket(@PathVariable Long flightId, @RequestBody TicketRequestDto requestDto){
         return ticketService.buyTicket(requestDto,flightId);
     }

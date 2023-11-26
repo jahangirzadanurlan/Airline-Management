@@ -6,6 +6,7 @@ import com.example.flightms.model.entity.Flight;
 import com.example.flightms.repository.FlightRepository;
 import com.example.flightms.service.IFlightService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class FlightService implements IFlightService {
     private final FlightRepository flightRepository;

@@ -46,8 +46,10 @@ public class PdfGeneratorService {
             document.add(new Paragraph(content));
             document.close();
 
+            String body = email + " your ticket information!";
+
             // PDF dosyasını e-posta ile gönder
-            mailSenderService.sendEmailWithAttachment(email, subject, content, baos.toByteArray(), filePath);
+            mailSenderService.sendEmailWithAttachment(email, subject, body, baos.toByteArray(), filePath);
         } catch (Exception e) {
             e.printStackTrace();
         }

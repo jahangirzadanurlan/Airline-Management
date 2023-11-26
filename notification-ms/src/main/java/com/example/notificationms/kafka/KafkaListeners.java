@@ -53,7 +53,12 @@ public class KafkaListeners {
     @KafkaListener(topics = "ticket-topic",groupId = "groupId")
     void ticketPDFMailSendingListener(KafkaRequest request) {
         log.info("ticket-topic Consumer ise dusdu -> {}",request.getEmail());
-        pdfGeneratorService.generatePdfAndSendEmail("Ticket Buying Mail!",request.toString(),request.getEmail(),"ticket.pdf");
+
+        String content = request.getFirstName() + " " + request.getLastName() + " your fromAirlineId=>" +
+                request.getFromAirlineId() + " toAirlineId=> " + request.getToAirlineId() + " ticket buying is successfully. \n" + "Departure Date Time => " + request.getDepartureDateTime()
+                + "\nArrival Date Time => " + request.getArrivalDateTime() + "\nTicket Price => " + request.getPrice();
+
+        pdfGeneratorService.generatePdfAndSendEmail("Ticket Buying Mail!",content,request.getEmail(),"ticket.pdf");
     }
 }
 

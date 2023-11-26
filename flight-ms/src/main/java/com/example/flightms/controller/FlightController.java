@@ -15,7 +15,7 @@ public class FlightController {
     private final IFlightService flightService;
 
     @PostMapping("/flights")
-    public ResponseEntity<String> addFlight(FlightRequestDto requestDto){
+    public ResponseEntity<String> addFlight(@RequestBody FlightRequestDto requestDto){
         return flightService.addFlight(requestDto);
     }
 

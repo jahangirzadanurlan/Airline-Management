@@ -1,4 +1,4 @@
-package com.example.bookingms.model.dto;
+package com.example.bookingms.model.dto.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

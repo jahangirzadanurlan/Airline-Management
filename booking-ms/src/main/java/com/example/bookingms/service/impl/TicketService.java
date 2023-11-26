@@ -1,7 +1,7 @@
 package com.example.bookingms.service.impl;
 
-import com.example.bookingms.model.dto.FlightResponseDto;
-import com.example.bookingms.model.dto.TicketResponseDto;
+import com.example.bookingms.model.dto.response.FlightResponseDto;
+import com.example.bookingms.model.dto.response.TicketResponseDto;
 import com.example.bookingms.model.dto.request.TicketRequestDto;
 import com.example.bookingms.model.entity.Ticket;
 import com.example.bookingms.repository.TicketRepository;

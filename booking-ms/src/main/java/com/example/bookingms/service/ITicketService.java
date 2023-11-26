@@ -1,6 +1,6 @@
 package com.example.bookingms.service;
 
-import com.example.bookingms.model.dto.TicketResponseDto;
+import com.example.bookingms.model.dto.response.TicketResponseDto;
 import com.example.bookingms.model.dto.request.TicketRequestDto;
 import org.springframework.http.ResponseEntity;
 
