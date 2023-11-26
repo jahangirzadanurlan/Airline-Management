@@ -2,13 +2,15 @@ package com.example.bookingms.service;
 
 import com.example.bookingms.model.dto.response.TicketResponseDto;
 import com.example.bookingms.model.dto.request.TicketRequestDto;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ResponseEntity;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface ITicketService {
-    List<TicketResponseDto> getAllTickets();
-    TicketResponseDto getTicketById(Long id);
+    List<TicketResponseDto> getAllTickets(String authHeader);
+    TicketResponseDto getTicketById(String authHeader,Long id);
     ResponseEntity<String> buyTicket(TicketRequestDto requestDto,Long flightId);
-    ResponseEntity<String> downloadTicketPDF(Long ticketId);
+    ResponseEntity<InputStreamResource> downloadTicketPDF(String authHeader,Long ticketId) throws IOException;
 }

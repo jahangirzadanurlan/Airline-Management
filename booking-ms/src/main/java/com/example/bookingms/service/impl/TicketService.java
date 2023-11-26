@@ -8,14 +8,23 @@ import com.example.bookingms.repository.TicketRepository;
 import com.example.bookingms.service.FlightClient;
 import com.example.bookingms.service.ITicketService;
 import com.example.commonnotification.dto.request.KafkaRequest;
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.PdfWriter;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,15 +36,19 @@ public class TicketService implements ITicketService {
     private final KafkaTemplate<String, KafkaRequest> kafkaTemplate;
 
     @Override
-    public List<TicketResponseDto> getAllTickets() {
-        return ticketRepository.findAll().stream()
+    public List<TicketResponseDto> getAllTickets(String authHeader) {
+        String firstName = getUsernameInHeader(authHeader); //logic
+
+        return ticketRepository.findAllByFirstName(firstName).stream()
                 .map(ticket -> modelMapper.map(ticket, TicketResponseDto.class))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public TicketResponseDto getTicketById(Long id) {
-        return modelMapper.map(ticketRepository.findById(id)
+    public TicketResponseDto getTicketById(String authHeader,Long id) {
+        String firstName = getUsernameInHeader(authHeader);
+
+        return modelMapper.map(ticketRepository.findByIdAndFirstName(id,firstName)
                 .orElseThrow(() -> new RuntimeException("Ticket not found!")), TicketResponseDto.class);
     }
 
@@ -78,12 +91,82 @@ public class TicketService implements ITicketService {
         ticketRepository.save(ticket);
     }
 
-    public String getUsernameInToken(String token){
+    public String getUsernameInHeader(String authHeader){
         return "Username";
     }
 
     @Override
-    public ResponseEntity<String> downloadTicketPDF(Long ticketId) {
+    public ResponseEntity<InputStreamResource> downloadTicketPDF(String authHeader, Long ticketId) throws IOException {
+        Optional<Ticket> ticket = ticketRepository.findById(ticketId);
+
+        String username = getUsernameInHeader(authHeader);
+        if (!username.equals(ticket.orElseThrow(() -> new RuntimeException("Ticket not found!")).getFirstName())){
+            throw new RuntimeException("Unauthenticated request!");
+        }
+
+        // Kullanıcının bilgilerini içeren PDF dosyasını oluşturun
+        byte[] pdfContent = createUserDetailsPDF(ticket.get());
+
+        // Dosyanın boyutunu alın
+        long contentLength;
+        if (pdfContent != null) {
+            contentLength = pdfContent.length;
+        }else {
+            throw new RuntimeException("Pdf content is null!");
+        }
+
+        // Dosyanın içeriğini temsil eden bir InputStreamResource oluşturun
+        InputStreamResource resource = new InputStreamResource(new ByteArrayInputStream(pdfContent));
+
+        // Dosya adını belirtin
+        String fileName = "ticket_details.pdf";
+
+        // Response Headers ayarlayın
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentLength(contentLength);
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", fileName);
+
+        // ResponseEntity'yi oluşturun
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(resource);
+
+    }
+
+    private byte[] createUserDetailsPDF(Ticket ticket) throws IOException {
+        // PDF oluştur
+        Document document = new Document();
+
+        String content = ticket.getFirstName() + " " + ticket.getLastName() + " your fromAirlineId=>" +
+                ticket.getFromAirlineId() + " toAirlineId=> " + ticket.getToAirlineId() + " ticket buying is successfully. \n" + "Departure Date Time => " + ticket.getDepartureDateTime()
+                + "\nArrival Date Time => " + ticket.getArrivalDateTime() + "\nTicket Price => " + ticket.getPrice();
+
+
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            PdfWriter.getInstance(document, baos);
+            document.open();
+            // Başlık
+            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 24, BaseColor.BLUE);
+            Paragraph title = new Paragraph("Ticket Information", titleFont);
+            title.setAlignment(Element.ALIGN_CENTER);
+            document.add(title);
+
+            // Boşluk
+            document.add(Chunk.NEWLINE);
+
+            // Metin
+            Font contentFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, BaseColor.BLACK);
+            Paragraph para = new Paragraph(content, contentFont);
+            para.setAlignment(Element.ALIGN_JUSTIFIED);
+            document.add(para);
+
+            document.add(new Paragraph(content));
+            document.close();
+            return baos.toByteArray();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
     }
 }
