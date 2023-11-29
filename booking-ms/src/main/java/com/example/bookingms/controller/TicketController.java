@@ -17,8 +17,8 @@ public class TicketController {
     private final ITicketService ticketService;
 
     @PostMapping("/tickets/{flightId}")
-    public ResponseEntity<String> buyTicket(@PathVariable Long flightId, @RequestBody TicketRequestDto requestDto){
-        return ticketService.buyTicket(requestDto,flightId);
+    public ResponseEntity<String> buyTicket(@RequestHeader(name = "Authorization") String authHeader,@PathVariable Long flightId, @RequestBody TicketRequestDto requestDto){
+        return ticketService.buyTicket(authHeader,requestDto,flightId);
     }
 
     @GetMapping("/tickets")
@@ -32,7 +32,7 @@ public class TicketController {
     }
 
     @GetMapping("/tickets/{ticketId}/pdf")
-    public ResponseEntity<InputStreamResource> downloadUserDetails(@RequestHeader(name = "Authorization") String authHeader,@PathVariable Long ticketId) throws IOException {
+    public ResponseEntity<InputStreamResource> downloadTicketDetails(@RequestHeader(name = "Authorization") String authHeader,@PathVariable Long ticketId) throws IOException {
         return ticketService.downloadTicketPDF(authHeader,ticketId);
     }
 }

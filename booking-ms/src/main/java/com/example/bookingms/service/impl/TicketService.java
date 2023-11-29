@@ -8,6 +8,8 @@ import com.example.bookingms.repository.TicketRepository;
 import com.example.bookingms.service.FlightClient;
 import com.example.bookingms.service.ITicketService;
 import com.example.commonnotification.dto.request.KafkaRequest;
+import com.example.commonsecurity.auth.SecurityHelper;
+import com.example.commonsecurity.auth.services.JwtService;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfWriter;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class TicketService implements ITicketService {
+    private final JwtService jwtService;
+    private final SecurityHelper securityHelper;
     private final TicketRepository ticketRepository;
     private final ModelMapper modelMapper;
     private final FlightClient flightClient;
@@ -37,25 +41,27 @@ public class TicketService implements ITicketService {
 
     @Override
     public List<TicketResponseDto> getAllTickets(String authHeader) {
-        String firstName = getUsernameInHeader(authHeader); //logic
+        String username = getUsernameInHeader(authHeader);
 
-        return ticketRepository.findAllByFirstName(firstName).stream()
+        return ticketRepository.findAllByUsername(username).stream()
                 .map(ticket -> modelMapper.map(ticket, TicketResponseDto.class))
                 .collect(Collectors.toList());
     }
 
     @Override
     public TicketResponseDto getTicketById(String authHeader,Long id) {
-        String firstName = getUsernameInHeader(authHeader);
+        String username = getUsernameInHeader(authHeader);
 
-        return modelMapper.map(ticketRepository.findByIdAndFirstName(id,firstName)
+        return modelMapper.map(ticketRepository.findByIdAndUsername(id,username)
                 .orElseThrow(() -> new RuntimeException("Ticket not found!")), TicketResponseDto.class);
     }
 
     @Override
-    public ResponseEntity<String> buyTicket(TicketRequestDto requestDto, Long flightId) {
+    public ResponseEntity<String> buyTicket(String authHeader,TicketRequestDto requestDto, Long flightId) {
+        String username = getUsernameInHeader(authHeader);
         FlightResponseDto flightDto = flightClient.getFlightById(flightId);
-        createAndSaveTicket(requestDto, flightDto);
+
+        createAndSaveTicket(username,requestDto, flightDto);
 
         KafkaRequest kafkaRequest = createKafkaRequest(requestDto, flightDto);
         kafkaTemplate.send("ticket-topic",kafkaRequest);
@@ -76,8 +82,9 @@ public class TicketService implements ITicketService {
                 .build();
     }
 
-    private void createAndSaveTicket(TicketRequestDto requestDto, FlightResponseDto flightDto) {
+    private void createAndSaveTicket(String username,TicketRequestDto requestDto, FlightResponseDto flightDto) {
         Ticket ticket = Ticket.builder()
+                .username(username)
                 .firstName(requestDto.getFirstName())
                 .lastName(requestDto.getLastName())
                 .fromAirlineId(flightDto.getFromAirlineId())
@@ -92,7 +99,12 @@ public class TicketService implements ITicketService {
     }
 
     public String getUsernameInHeader(String authHeader){
-        return "Username";
+        if (!securityHelper.authHeaderIsValid(authHeader)){
+            throw new RuntimeException("Authorization header not true!");
+        }
+        String jwtToken=authHeader.substring(7);
+
+        return jwtService.extractUsername(jwtToken);
     }
 
     @Override
@@ -100,7 +112,7 @@ public class TicketService implements ITicketService {
         Optional<Ticket> ticket = ticketRepository.findById(ticketId);
 
         String username = getUsernameInHeader(authHeader);
-        if (!username.equals(ticket.orElseThrow(() -> new RuntimeException("Ticket not found!")).getFirstName())){
+        if (!username.equals(ticket.orElseThrow(() -> new RuntimeException("Ticket not found!")).getUsername())){
             throw new RuntimeException("Unauthenticated request!");
         }
 

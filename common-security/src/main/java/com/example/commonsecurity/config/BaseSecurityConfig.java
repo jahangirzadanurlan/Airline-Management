@@ -32,9 +32,4 @@ public class BaseSecurityConfig extends WebSecurityConfigurerAdapter {
 
     }
 
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception{
-        return super.authenticationManagerBean();
-    }
 }

@@ -1,4 +1,4 @@
-package com.example.userms.config;
+package com.example.bookingms.auth;
 
 import com.example.commonsecurity.config.ApplicationSecurityConfigurer;
 import com.example.commonsecurity.model.RoleType;
@@ -6,9 +6,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Slf4j
@@ -17,11 +17,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @ComponentScan("com.example.commonsecurity")
 public class SecurityConfig implements ApplicationSecurityConfigurer {
-    private final AuthenticationProvider authenticationProvider;
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtRequestFilter jwtAuthenticationFilter;
 
-    private static final String POST_GET_USER = "/auth/**";
-    private static final String POST_ADMIN_REGISTER = "/admin/**";
+    private static final String POST_GET_TICKET = "/tickets/**";
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
@@ -29,9 +27,11 @@ public class SecurityConfig implements ApplicationSecurityConfigurer {
 
                 http.authorizeRequests(authorizeRequests ->
                         authorizeRequests
-                            .antMatchers(POST_GET_USER).permitAll()
-                            .antMatchers(POST_ADMIN_REGISTER).hasRole(RoleType.ADMIN.name()))
-                        .authenticationProvider(authenticationProvider)
+                            .antMatchers(POST_GET_TICKET).hasRole(RoleType.USER.name())
+                                .antMatchers())
+
+                        .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        .and()
                         .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
     }
 

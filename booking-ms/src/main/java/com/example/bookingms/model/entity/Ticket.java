@@ -19,6 +19,7 @@ public class Ticket {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+    String username;
     String firstName;
     String lastName;
     Long fromAirlineId;//Id meselesi

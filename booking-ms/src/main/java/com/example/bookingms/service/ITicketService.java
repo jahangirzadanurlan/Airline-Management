@@ -11,6 +11,6 @@ import java.util.List;
 public interface ITicketService {
     List<TicketResponseDto> getAllTickets(String authHeader);
     TicketResponseDto getTicketById(String authHeader,Long id);
-    ResponseEntity<String> buyTicket(TicketRequestDto requestDto,Long flightId);
+    ResponseEntity<String> buyTicket(String authHeader,TicketRequestDto requestDto,Long flightId);
     ResponseEntity<InputStreamResource> downloadTicketPDF(String authHeader,Long ticketId) throws IOException;
 }

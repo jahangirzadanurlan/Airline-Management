@@ -21,6 +21,7 @@
             <option value="$PROJECT_DIR$/booking-ms" />
             <option value="$PROJECT_DIR$/common-email" />
             <option value="$PROJECT_DIR$/common-notification" />
+            <option value="$PROJECT_DIR$/common-security" />
           </set>
         </option>
       </GradleProjectSettings>
@@ -49,6 +50,15 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/common-file-generator" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$/common-ms" />
+        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/common-ms" />
           </set>
         </option>
       </GradleProjectSettings>
