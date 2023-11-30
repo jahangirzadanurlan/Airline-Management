@@ -58,6 +58,7 @@ public class FlightService implements IFlightService {
 
     @Override
     public ResponseEntity<String> deleteFlight(Long id) {
+        flightRepository.findById(id).orElseThrow(() -> new RuntimeException("Flight not found!"));
         flightRepository.deleteById(id);
         return ResponseEntity.ok().body("Deleting is successfully!");
     }
@@ -65,9 +66,14 @@ public class FlightService implements IFlightService {
     @Override
     public ResponseEntity<String> patchFlight(Long id, String isFly) {
         Optional<Flight> flight = flightRepository.findById(id);
-        flight.orElseThrow(() -> new RuntimeException("Plane not found!"))
-                .setFly(isFly.equalsIgnoreCase("true"));
 
-        return ResponseEntity.ok().body("Flight updated!");
+        if (isFly.equalsIgnoreCase("true") || isFly.equalsIgnoreCase("false")){
+            flight.orElseThrow(() -> new RuntimeException("Plane not found!"))
+                    .setFly(isFly.equalsIgnoreCase("true"));
+            flightRepository.save(flight.get());
+            return ResponseEntity.ok().body("Flight updated!");
+        }else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Request body isFly => " + isFly + " is not true! ");
+        }
     }
 }

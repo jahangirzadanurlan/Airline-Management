@@ -85,6 +85,7 @@
         <option name="gradleJvm" value="#JAVA_HOME" />
         <option name="modules">
           <set>
+            <option value="$PROJECT_DIR$/common-security" />
             <option value="$PROJECT_DIR$/flight-ms" />
           </set>
         </option>

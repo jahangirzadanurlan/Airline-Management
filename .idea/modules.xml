@@ -14,6 +14,8 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/common-exception.main.iml" filepath="$PROJECT_DIR$/.idea/modules/common-exception.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/common-notification.main.iml" filepath="$PROJECT_DIR$/.idea/modules/common-notification.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/common-security.main.iml" filepath="$PROJECT_DIR$/.idea/modules/common-security.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1080498532/flight-ms.common-security.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-1080498532/flight-ms.common-security.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/flight-ms.main.iml" filepath="$PROJECT_DIR$/.idea/modules/flight-ms.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1764394560/notification-ms.common-email.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-1764394560/notification-ms.common-email.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/-658380217/notification-ms.common-notification.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-658380217/notification-ms.common-notification.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/notification-ms.main.iml" filepath="$PROJECT_DIR$/.idea/modules/notification-ms.main.iml" />

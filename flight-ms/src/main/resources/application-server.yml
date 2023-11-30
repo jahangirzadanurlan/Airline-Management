@@ -3,5 +3,5 @@ spring:
     name: flight-ms
 server:
   servlet:
-    context-path: /flight
+    context-path: /flight-ms
   port: 8085
