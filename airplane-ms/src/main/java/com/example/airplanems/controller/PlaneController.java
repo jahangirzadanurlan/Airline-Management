@@ -11,36 +11,36 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/airplane-ms")
+@RequestMapping("/airplanes")
 public class PlaneController {
     private final IPlaneService planeService;
 
-    @PostMapping("/airplanes")
-    public ResponseEntity<String> addPlane(PlaneRequestDto requestDto){
+    @PostMapping
+    public ResponseEntity<String> addPlane(@RequestBody PlaneRequestDto requestDto){
         return planeService.addPlane(requestDto);
     }
 
-    @PutMapping("/airplanes")
-    public ResponseEntity<String> updatePlane(Plane plane){
+    @PutMapping
+    public ResponseEntity<String> updatePlane(@RequestBody Plane plane){
         return planeService.updatePlane(plane);
     }
 
-    @DeleteMapping("/airplanes/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deletePlane(@PathVariable Long id){
         return planeService.deletePlane(id);
     }
 
-    @PatchMapping("/airplanes/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<String> patchPlane(@PathVariable Long id,@RequestBody String isBusy){
         return planeService.patchPlane(id,isBusy);
     }
 
-    @GetMapping("/airplanes")
+    @GetMapping
     public List<Plane> getAllPlanes(){
         return planeService.getAllPlanes();
     }
 
-    @GetMapping("/airplanes/{id}")
+    @GetMapping("/{id}")
     public Plane getPlaneById(@PathVariable Long id){
         return planeService.getPlaneById(id);
     }

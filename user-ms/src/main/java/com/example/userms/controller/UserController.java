@@ -66,6 +66,8 @@ public class UserController {
 
     //----------------------------
 
+
+    //-----For Admin------
     @GetMapping("/auth/set-password/{token}")
     public ResponseEntity<String> setAdminPasswordPage(@PathVariable String token){
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(userService.passwordSetPage(token));
@@ -81,6 +83,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.saveAdmin(userRequestDto));
     }
 
+    //----------------------------
 
 
 

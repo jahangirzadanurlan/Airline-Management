@@ -5,6 +5,7 @@ import com.example.airplanems.model.entity.Plane;
 import com.example.airplanems.repository.PlaneRepository;
 import com.example.airplanems.service.IPlaneService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class PlaneService implements IPlaneService {
     private final ModelMapper modelMapper;
@@ -37,6 +39,7 @@ public class PlaneService implements IPlaneService {
 
     @Override
     public ResponseEntity<String> updatePlane(Plane plane) {
+        planeRepository.findById(plane.getId()).orElseThrow(() -> new RuntimeException("Plane not found!"));
         planeRepository.save(plane);
         return ResponseEntity.ok().body(plane.getName() + " updated");
     }
@@ -51,9 +54,15 @@ public class PlaneService implements IPlaneService {
     @Override
     public ResponseEntity<String> patchPlane(Long id,String isBusy) {
         Optional<Plane> plane = planeRepository.findById(id);
-        plane.orElseThrow(() -> new RuntimeException("Plane not found!"))
-                .setBusy(isBusy.equalsIgnoreCase("true"));
 
-        return ResponseEntity.ok().body("Plane updated!");
+        if (isBusy.equalsIgnoreCase("true") || isBusy.equalsIgnoreCase("false")){
+            plane.orElseThrow(() -> new RuntimeException("Plane not found!"))
+                    .setBusy(isBusy.equalsIgnoreCase("true"));
+            planeRepository.save(plane.get());
+            return ResponseEntity.ok().body("Plane updated!");
+        }else {
+            log.info("isBusy request => {}",isBusy);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Request body is not true!");
+        }
     }
 }
