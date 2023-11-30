@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -28,8 +29,16 @@ public class PlaneService implements IPlaneService {
     }
 
     @Override
-    public List<Plane> getAllPlanes() {
-        return planeRepository.findAll();
+    public List<Plane> getAllPlanes(String isBusy) {
+        List<Plane> allPlanes = planeRepository.findAll();
+
+        if (isBusy.equalsIgnoreCase("false")){
+            return allPlanes.stream()
+                    .filter(plane -> !plane.isBusy())
+                    .collect(Collectors.toList());
+        }else {
+            return allPlanes;
+        }
     }
 
     @Override

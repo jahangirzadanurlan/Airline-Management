@@ -36,8 +36,8 @@ public class PlaneController {
     }
 
     @GetMapping
-    public List<Plane> getAllPlanes(){
-        return planeService.getAllPlanes();
+    public List<Plane> getAllPlanes(@RequestBody String isBusy){
+        return planeService.getAllPlanes(isBusy);
     }
 
     @GetMapping("/{id}")

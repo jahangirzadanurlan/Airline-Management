@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface IPlaneService {
     ResponseEntity<String> addPlane(PlaneRequestDto requestDto);
-    List<Plane> getAllPlanes();
+    List<Plane> getAllPlanes(String isBusy);
     Plane getPlaneById(Long id);
     ResponseEntity<String> updatePlane(Plane plane);
     ResponseEntity<String> deletePlane(Long id);
