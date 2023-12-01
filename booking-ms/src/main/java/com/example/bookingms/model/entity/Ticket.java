@@ -26,7 +26,11 @@ public class Ticket {
     Long toAirlineId;
     LocalDateTime departureDateTime;
     LocalDateTime arrivalDateTime;
-    double price;
     Long flightId;
     LocalDateTime buyDate;
+    double price;
+    double currentPrice;
+
+    public static int saleTicketCount;
+
 }

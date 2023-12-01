@@ -2,6 +2,7 @@ package com.example.bookingms.controller;
 
 import com.example.bookingms.model.dto.request.TicketRequestDto;
 import com.example.bookingms.model.dto.response.TicketResponseDto;
+import com.example.bookingms.model.entity.Ticket;
 import com.example.bookingms.service.ITicketService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.InputStreamResource;
@@ -34,6 +35,16 @@ public class TicketController {
     @GetMapping("/tickets/{ticketId}/pdf")
     public ResponseEntity<InputStreamResource> downloadTicketDetails(@RequestHeader(name = "Authorization") String authHeader,@PathVariable Long ticketId) throws IOException {
         return ticketService.downloadTicketPDF(authHeader,ticketId);
+    }
+
+    @GetMapping("/sale-ticket-count")
+    public int getSaleTicketCount(){
+        return Ticket.saleTicketCount;
+    }
+
+    @PostMapping("/sale-ticket-count")
+    public void changeSaleTicketCount(){
+        Ticket.saleTicketCount = 0;
     }
 }
 

@@ -33,6 +33,7 @@ public class FlightService implements IFlightService {
     @Override
     public List<FlightResponseDto> getAllFlights() {
         return flightRepository.findAll().stream()
+                .peek(flight -> flight.setPrice(flight.getInitialPrice() + (flight.getInitialPrice() * (flight.getTicketIncreasePercentBYSeatsCount() + Flight.ticketIncreasePercentBYSaleTicketCount))/100))
                 .map(flight -> modelMapper.map(flight,FlightResponseDto.class))
                 .collect(Collectors.toList());
     }

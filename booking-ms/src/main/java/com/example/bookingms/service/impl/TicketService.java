@@ -78,7 +78,7 @@ public class TicketService implements ITicketService {
                 .toAirlineId(flightDto.getToAirlineId())
                 .departureDateTime(flightDto.getDepartureDateTime())
                 .arrivalDateTime(flightDto.getArrivalDateTime())
-                .price(flightDto.getInitialPrice())
+                .price(flightDto.getPrice())
                 .build();
     }
 
@@ -91,7 +91,7 @@ public class TicketService implements ITicketService {
                 .toAirlineId(flightDto.getToAirlineId())
                 .departureDateTime(flightDto.getDepartureDateTime())
                 .arrivalDateTime(flightDto.getArrivalDateTime())
-                .price(flightDto.getInitialPrice())
+                .price(flightDto.getPrice())
                 .flightId(flightDto.getId())
                 .buyDate(LocalDateTime.now())
                 .build();

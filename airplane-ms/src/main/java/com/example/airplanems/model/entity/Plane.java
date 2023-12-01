@@ -19,8 +19,10 @@ public class Plane {
     Long id;
     String name;
     int masSeats;
+    int availableSeats;
     int maxSpeed;
     boolean isBusy;
+
 }
 
 
