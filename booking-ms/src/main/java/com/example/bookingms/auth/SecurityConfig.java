@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -27,6 +28,8 @@ public class SecurityConfig implements ApplicationSecurityConfigurer {
 
                 http.authorizeRequests(authorizeRequests ->
                         authorizeRequests
+                                .antMatchers(HttpMethod.GET,"/sale-ticket-count").permitAll()
+                                .antMatchers(HttpMethod.POST,"/sale-ticket-count").permitAll()
                             .antMatchers(POST_GET_TICKET).hasRole(RoleType.USER.name())
                                 .antMatchers())
 
