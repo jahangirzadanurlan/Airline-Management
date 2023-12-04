@@ -44,4 +44,9 @@ public class FlightController {
         return flightService.getFlightById(id);
     }
 
+    @GetMapping("/flights/price/{id}")
+    public double getFlightPrice(@PathVariable Long id){
+        return flightService.getFlightPrice(id);
+    }
+
 }

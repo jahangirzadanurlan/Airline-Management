@@ -23,7 +23,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -59,17 +58,22 @@ public class TicketService implements ITicketService {
     @Override
     public ResponseEntity<String> buyTicket(String authHeader,TicketRequestDto requestDto, Long flightId) {
         String username = getUsernameInHeader(authHeader);
+        double flightPrice = getFlightPrice(flightId); //exception
         FlightResponseDto flightDto = flightClient.getFlightById(flightId);
 
-        createAndSaveTicket(username,requestDto, flightDto);
+        createAndSaveTicket(username,requestDto, flightDto,flightPrice);
 
-        KafkaRequest kafkaRequest = createKafkaRequest(requestDto, flightDto);
+        KafkaRequest kafkaRequest = createKafkaRequest(requestDto, flightDto,flightPrice);
         kafkaTemplate.send("ticket-topic",kafkaRequest);
 
         return ResponseEntity.ok().body("Ticket buy is successfully!");
     }
 
-    private static KafkaRequest createKafkaRequest(TicketRequestDto requestDto, FlightResponseDto flightDto) {
+    public double getFlightPrice(Long flightId){
+        return flightClient.getFlightPriceById(flightId);
+    }
+
+    private static KafkaRequest createKafkaRequest(TicketRequestDto requestDto, FlightResponseDto flightDto,double flightPrice) {
         return KafkaRequest.builder()
                 .email(requestDto.getEmail())
                 .firstName(requestDto.getFirstName())
@@ -78,11 +82,11 @@ public class TicketService implements ITicketService {
                 .toAirlineId(flightDto.getToAirlineId())
                 .departureDateTime(flightDto.getDepartureDateTime())
                 .arrivalDateTime(flightDto.getArrivalDateTime())
-                .price(flightDto.getPrice())
+                .price(flightPrice)
                 .build();
     }
 
-    private void createAndSaveTicket(String username,TicketRequestDto requestDto, FlightResponseDto flightDto) {
+    private void createAndSaveTicket(String username,TicketRequestDto requestDto, FlightResponseDto flightDto,double flightPrice) {
         Ticket ticket = Ticket.builder()
                 .username(username)
                 .firstName(requestDto.getFirstName())
@@ -91,10 +95,11 @@ public class TicketService implements ITicketService {
                 .toAirlineId(flightDto.getToAirlineId())
                 .departureDateTime(flightDto.getDepartureDateTime())
                 .arrivalDateTime(flightDto.getArrivalDateTime())
-                .price(flightDto.getPrice())
+                .price(flightPrice)
                 .flightId(flightDto.getId())
                 .buyDate(LocalDateTime.now())
                 .build();
+        Ticket.saleTicketCount += 1;
         ticketRepository.save(ticket);
     }
 
@@ -108,7 +113,7 @@ public class TicketService implements ITicketService {
     }
 
     @Override
-    public ResponseEntity<InputStreamResource> downloadTicketPDF(String authHeader, Long ticketId) throws IOException {
+    public ResponseEntity<InputStreamResource> downloadTicketPDF(String authHeader, Long ticketId) {
         Optional<Ticket> ticket = ticketRepository.findById(ticketId);
 
         String username = getUsernameInHeader(authHeader);
@@ -146,7 +151,7 @@ public class TicketService implements ITicketService {
 
     }
 
-    private byte[] createUserDetailsPDF(Ticket ticket) throws IOException {
+    private byte[] createUserDetailsPDF(Ticket ticket) {
         // PDF oluştur
         Document document = new Document();
 

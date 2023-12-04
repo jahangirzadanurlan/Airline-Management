@@ -6,19 +6,23 @@ import com.example.flightms.repository.FlightRepository;
 import com.example.flightms.service.AirplaneClient;
 import com.example.flightms.service.TicketClient;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ScheduledService {
     private final TicketClient ticketClient;
     private final AirplaneClient airplaneClient;
     private final FlightRepository flightRepository;
 
-    @Scheduled(fixedRate = 10000)
+    @Scheduled(fixedRate = 20 * 1000)
     public void changeTicketPrice(){
+        log.info("changeTicketPrice method working");
         changeTicketIncreasePercentByTicketSaleCount();
+        log.info("changeTicketIncreasePercentByTicketSaleCount method passed");
 
         flightRepository.findAll().stream()
                 .map(Flight::getAirplaneId)
@@ -27,7 +31,10 @@ public class ScheduledService {
     }
 
     private void changeTicketIncreasePercentByTicketSaleCount() {
+        log.info("changeTicketIncreasePercentByTicketSaleCount method working");
+
         int ticketSaleCount = ticketClient.getTicketSaleCount();
+        log.info("ticketSaleCount => {}",ticketSaleCount);
 
         if (ticketSaleCount > 10){
             Flight.ticketIncreasePercentBYSaleTicketCount += 9;
@@ -38,13 +45,15 @@ public class ScheduledService {
         } else {
             Flight.ticketIncreasePercentBYSaleTicketCount -= 1;
         }
-
+        log.info("Flight.ticketIncreasePercentBYSaleTicketCount => {}",Flight.ticketIncreasePercentBYSaleTicketCount);
         ticketClient.changeSaleTicketCount();
     }
 
     private void changeTicketIncreasePercentBySeatsCount(Long airplaneId) {
         PlaneResponseDto planeResponseDto = airplaneClient.getAirplaneById(airplaneId);
         Flight flight = flightRepository.findByAirplaneId(airplaneId);
+        log.info("planeResponseDto => {}",planeResponseDto.toString());
+        log.info("flight => {}",flight.toString());
 
         int maxSeats = planeResponseDto.getMasSeats();
         int availableSeats = planeResponseDto.getAvailableSeats();
@@ -58,6 +67,7 @@ public class ScheduledService {
         } else if (availableSeats < (maxSeats * 30)/100) {
             flight.setTicketIncreasePercentBYSeatsCount(6);
         }
+        log.info("flight.getTicketIncreasePercentBYSeatsCount => {}",flight.getTicketIncreasePercentBYSeatsCount());
 
         flightRepository.save(flight);
     }

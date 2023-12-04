@@ -33,9 +33,24 @@ public class FlightService implements IFlightService {
     @Override
     public List<FlightResponseDto> getAllFlights() {
         return flightRepository.findAll().stream()
-                .peek(flight -> flight.setPrice(flight.getInitialPrice() + (flight.getInitialPrice() * (flight.getTicketIncreasePercentBYSeatsCount() + Flight.ticketIncreasePercentBYSaleTicketCount))/100))
+                .peek(flight -> {
+                    double flightPrice = getFlightPrice(flight.getId());
+                    flight.setPrice(flightPrice);
+                    log.info("flight initial-price => {}",flight.getInitialPrice());
+                    log.info("flight  Ticket Increase Percent BY Seats Count => {}",flight.getTicketIncreasePercentBYSeatsCount());
+                    log.info("flight  Ticket Increase Percent BY Sale Ticket Count => {}",Flight.ticketIncreasePercentBYSaleTicketCount);
+                    log.info("flight  common price => {}", flightPrice);
+
+                })
                 .map(flight -> modelMapper.map(flight,FlightResponseDto.class))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public double getFlightPrice(Long flightId) {
+        Optional<Flight> flight = flightRepository.findById(flightId);
+        flight.orElseThrow(() -> new RuntimeException("Flight not found"));
+        return flight.get().getInitialPrice() + (flight.get().getInitialPrice() * (flight.get().getTicketIncreasePercentBYSeatsCount() + Flight.ticketIncreasePercentBYSaleTicketCount)) / 100;
     }
 
     @Override

@@ -16,5 +16,4 @@ public class FlightResponseDto {
     Long toAirlineId;
     LocalDateTime departureDateTime;
     LocalDateTime arrivalDateTime;
-    double price;
 }
