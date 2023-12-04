@@ -26,6 +26,7 @@ public class Flight {
     LocalDateTime arrivalDateTime;
     Long airplaneId;
     boolean isFly;
+    double price;
     double initialPrice;
     double ticketIncreasePercentBYSeatsCount;
     public static double ticketIncreasePercentBYSaleTicketCount;

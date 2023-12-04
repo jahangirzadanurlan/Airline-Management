@@ -30,7 +30,7 @@ public class SecurityConfig implements ApplicationSecurityConfigurer {
                         authorizeRequests
                                 .antMatchers(HttpMethod.GET,"/sale-ticket-count").permitAll()
                                 .antMatchers(HttpMethod.POST,"/sale-ticket-count").permitAll()
-                            .antMatchers(POST_GET_TICKET).hasRole(RoleType.USER.name())
+                            .antMatchers(POST_GET_TICKET).hasAnyRole(RoleType.USER.name(),RoleType.ADMIN.name())
                                 .antMatchers())
 
                         .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)

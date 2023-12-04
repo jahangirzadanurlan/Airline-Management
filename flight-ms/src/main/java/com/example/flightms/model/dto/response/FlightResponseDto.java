@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FlightResponseDto {
     Long id;
+    Long airplaneId;
     Long fromAirlineId;
     Long toAirlineId;
     LocalDateTime departureDateTime;

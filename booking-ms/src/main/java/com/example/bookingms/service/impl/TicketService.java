@@ -15,6 +15,7 @@ import com.example.commonsecurity.auth.services.JwtService;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfWriter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -31,6 +32,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class TicketService implements ITicketService {
     private final JwtService jwtService;
@@ -64,6 +66,7 @@ public class TicketService implements ITicketService {
         double flightPrice = getFlightPrice(flightId); //exception
         FlightResponseDto flightDto = flightClient.getFlightById(flightId);
 
+        log.info("flightDto.getAirplaneId() => {}",flightDto.getAirplaneId());
         PlaneResponseDto airplane = airplaneClient.getAirplaneById(flightDto.getAirplaneId());
         if (requestDto.getPlaneSeatNumber() > airplane.getMasSeats()){
             throw new RuntimeException("There is no such seat number");
@@ -109,6 +112,7 @@ public class TicketService implements ITicketService {
                 .arrivalDateTime(flightDto.getArrivalDateTime())
                 .price(flightPrice)
                 .flightId(flightDto.getId())
+                .planeSeatNumber(requestDto.getPlaneSeatNumber())
                 .buyDate(LocalDateTime.now())
                 .build();
         Ticket.saleTicketCount += 1;
