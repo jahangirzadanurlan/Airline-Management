@@ -22,7 +22,8 @@ public class Ticket {
     String username;
     String firstName;
     String lastName;
-    Long fromAirlineId;//Id meselesi
+    int planeSeatNumber;
+    Long fromAirlineId;
     Long toAirlineId;
     LocalDateTime departureDateTime;
     LocalDateTime arrivalDateTime;

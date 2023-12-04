@@ -1,10 +1,12 @@
 package com.example.bookingms.service.impl;
 
 import com.example.bookingms.model.dto.response.FlightResponseDto;
+import com.example.bookingms.model.dto.response.PlaneResponseDto;
 import com.example.bookingms.model.dto.response.TicketResponseDto;
 import com.example.bookingms.model.dto.request.TicketRequestDto;
 import com.example.bookingms.model.entity.Ticket;
 import com.example.bookingms.repository.TicketRepository;
+import com.example.bookingms.service.AirplaneClient;
 import com.example.bookingms.service.FlightClient;
 import com.example.bookingms.service.ITicketService;
 import com.example.commonnotification.dto.request.KafkaRequest;
@@ -36,6 +38,7 @@ public class TicketService implements ITicketService {
     private final TicketRepository ticketRepository;
     private final ModelMapper modelMapper;
     private final FlightClient flightClient;
+    private final AirplaneClient airplaneClient;
     private final KafkaTemplate<String, KafkaRequest> kafkaTemplate;
 
     @Override
@@ -60,6 +63,15 @@ public class TicketService implements ITicketService {
         String username = getUsernameInHeader(authHeader);
         double flightPrice = getFlightPrice(flightId); //exception
         FlightResponseDto flightDto = flightClient.getFlightById(flightId);
+
+        PlaneResponseDto airplane = airplaneClient.getAirplaneById(flightDto.getAirplaneId());
+        if (requestDto.getPlaneSeatNumber() > airplane.getMasSeats()){
+            throw new RuntimeException("There is no such seat number");
+        }
+
+        if (ticketRepository.findByPlaneSeatNumber(requestDto.getPlaneSeatNumber()).isPresent()){
+            throw new RuntimeException("This seat already taken");
+        }
 
         createAndSaveTicket(username,requestDto, flightDto,flightPrice);
 

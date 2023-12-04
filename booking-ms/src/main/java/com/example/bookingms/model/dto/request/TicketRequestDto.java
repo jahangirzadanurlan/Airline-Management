@@ -12,4 +12,5 @@ public class TicketRequestDto {
     String firstName;
     String lastName;
     String email;
+    int planeSeatNumber;
 }

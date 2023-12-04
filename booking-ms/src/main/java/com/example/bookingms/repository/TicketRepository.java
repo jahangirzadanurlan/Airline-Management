@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface TicketRepository extends JpaRepository<Ticket,Long> {
     List<Ticket> findAllByUsername(String username);
     Optional<Ticket> findByIdAndUsername(Long ticketId, String username);
+    Optional<Ticket> findByPlaneSeatNumber(int findByPlaneSeatNumber);
 }

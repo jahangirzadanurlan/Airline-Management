@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: common-ms
+server:
+  servlet:
+    context-path: /common-ms
+  port: 8080
+
