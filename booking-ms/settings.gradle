@@ -2,7 +2,9 @@ rootProject.name = 'booking-ms'
 include 'common-email'
 include 'common-notification'
 include 'common-security'
+include 'common-file-generator'
 
+project(':common-file-generator').projectDir = new File(settingsDir, '../common-file-generator')
 project(':common-notification').projectDir = new File(settingsDir, '../common-notification')
 project(':common-email').projectDir = new File(settingsDir, '../common-email')
 project(':common-security').projectDir = new File(settingsDir, '../common-security')

@@ -9,6 +9,7 @@ import com.example.bookingms.repository.TicketRepository;
 import com.example.bookingms.service.AirplaneClient;
 import com.example.bookingms.service.FlightClient;
 import com.example.bookingms.service.ITicketService;
+import com.example.commonfilegenerator.service.PdfGeneratorService;
 import com.example.commonnotification.dto.request.KafkaRequest;
 import com.example.commonsecurity.auth.SecurityHelper;
 import com.example.commonsecurity.auth.services.JwtService;
@@ -137,8 +138,12 @@ public class TicketService implements ITicketService {
             throw new RuntimeException("Unauthenticated request!");
         }
 
+        String content = ticket.get().getFirstName() + " " + ticket.get().getLastName() + " your fromAirlineId=>" +
+                ticket.get().getFromAirlineId() + " toAirlineId=> " + ticket.get().getToAirlineId() + " ticket buying is successfully. \n" + "Departure Date Time => " + ticket.get().getDepartureDateTime()
+                + "\nArrival Date Time => " + ticket.get().getArrivalDateTime() + "\nTicket Price => " + ticket.get().getPrice();
+
         // Kullanıcının bilgilerini içeren PDF dosyasını oluşturun
-        byte[] pdfContent = createUserDetailsPDF(ticket.get());
+        byte[] pdfContent = PdfGeneratorService.generatePdf(content);
 
         // Dosyanın boyutunu alın
         long contentLength;
@@ -165,41 +170,5 @@ public class TicketService implements ITicketService {
                 .headers(headers)
                 .body(resource);
 
-    }
-
-    private byte[] createUserDetailsPDF(Ticket ticket) {
-        // PDF oluştur
-        Document document = new Document();
-
-        String content = ticket.getFirstName() + " " + ticket.getLastName() + " your fromAirlineId=>" +
-                ticket.getFromAirlineId() + " toAirlineId=> " + ticket.getToAirlineId() + " ticket buying is successfully. \n" + "Departure Date Time => " + ticket.getDepartureDateTime()
-                + "\nArrival Date Time => " + ticket.getArrivalDateTime() + "\nTicket Price => " + ticket.getPrice();
-
-
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            PdfWriter.getInstance(document, baos);
-            document.open();
-            // Başlık
-            Font titleFont = FontFactory.getFont(FontFactory.HELVETICA_BOLD, 24, BaseColor.BLUE);
-            Paragraph title = new Paragraph("Ticket Information", titleFont);
-            title.setAlignment(Element.ALIGN_CENTER);
-            document.add(title);
-
-            // Boşluk
-            document.add(Chunk.NEWLINE);
-
-            // Metin
-            Font contentFont = FontFactory.getFont(FontFactory.TIMES_ROMAN, 12, BaseColor.BLACK);
-            Paragraph para = new Paragraph(content, contentFont);
-            para.setAlignment(Element.ALIGN_JUSTIFIED);
-            document.add(para);
-
-            document.add(new Paragraph(content));
-            document.close();
-            return baos.toByteArray();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 }

@@ -2,18 +2,20 @@ package com.example.notificationms.kafka;
 
 import com.example.commonemail.service.MailSenderService;
 import com.example.commonnotification.dto.request.KafkaRequest;
-import com.example.notificationms.service.PdfGeneratorService;
+import com.example.notificationms.service.GeneratePdfAndSendMail;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
+
+import javax.mail.MessagingException;
 
 @RequiredArgsConstructor
 @Slf4j
 @Service
 public class KafkaListeners {
     private final MailSenderService mailSenderService;
-    private final PdfGeneratorService pdfGeneratorService;
+    private final GeneratePdfAndSendMail generatePdfAndSendMail;
 
     @KafkaListener(topics = "confirm-topic",groupId = "groupId")
     void UserConfirmationListener(KafkaRequest request) {
@@ -58,7 +60,7 @@ public class KafkaListeners {
                 request.getFromAirlineId() + " toAirlineId=> " + request.getToAirlineId() + " ticket buying is successfully. \n" + "Departure Date Time => " + request.getDepartureDateTime()
                 + "\nArrival Date Time => " + request.getArrivalDateTime() + "\nTicket Price => " + request.getPrice();
 
-        pdfGeneratorService.generatePdfAndSendEmail("Ticket Buying Mail!",content,request.getEmail(),"ticket.pdf");
+        generatePdfAndSendMail.generatePdfAndSendEmail("Ticket Buying Mail!",content,request.getEmail(),"ticket.pdf");
     }
 }
 

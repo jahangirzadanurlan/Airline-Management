@@ -28,6 +28,7 @@ ext {
 dependencies {
     implementation project(":common-email")
     implementation project(":common-notification")
+    implementation project(":common-file-generator")
 
     implementation 'org.springframework.kafka:spring-kafka'
     implementation 'org.springframework.boot:spring-boot-starter-mail'

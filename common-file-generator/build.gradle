@@ -21,8 +21,18 @@ repositories {
     mavenCentral()
 }
 
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'com.itextpdf:itextpdf:5.5.13.3'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

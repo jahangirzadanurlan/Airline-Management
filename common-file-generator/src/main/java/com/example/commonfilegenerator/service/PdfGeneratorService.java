@@ -1,19 +1,12 @@
-package com.example.notificationms.service;
+package com.example.commonfilegenerator.service;
 
-import com.example.commonemail.service.MailSenderService;
 import com.itextpdf.text.*;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import java.io.ByteArrayOutputStream;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-@Service
-@RequiredArgsConstructor
 public class PdfGeneratorService {
-    private final MailSenderService mailSenderService;
-
-    public void generatePdfAndSendEmail(String subject,String content,String email, String filePath) {
+    public static byte[] generatePdf(String content) {
         // PDF oluştur
         Document document = new Document();
 
@@ -46,12 +39,10 @@ public class PdfGeneratorService {
             document.add(new Paragraph(content));
             document.close();
 
-            String body = email + " your ticket information!";
-
-            // PDF dosyasını e-posta ile gönder
-            mailSenderService.sendEmailWithAttachment(email, subject, body, baos.toByteArray(), filePath);
+            return baos.toByteArray();
         } catch (Exception e) {
             e.printStackTrace();
         }
+        throw new RuntimeException("generatePdfAndSendEmail not successfully!");
     }
 }

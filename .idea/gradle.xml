@@ -20,6 +20,7 @@
           <set>
             <option value="$PROJECT_DIR$/booking-ms" />
             <option value="$PROJECT_DIR$/common-email" />
+            <option value="$PROJECT_DIR$/common-file-generator" />
             <option value="$PROJECT_DIR$/common-notification" />
             <option value="$PROJECT_DIR$/common-security" />
           </set>
@@ -96,6 +97,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/common-email" />
+            <option value="$PROJECT_DIR$/common-file-generator" />
             <option value="$PROJECT_DIR$/common-notification" />
             <option value="$PROJECT_DIR$/notification-ms" />
           </set>
