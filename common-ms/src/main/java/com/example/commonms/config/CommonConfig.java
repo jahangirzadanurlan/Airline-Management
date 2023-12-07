@@ -2,12 +2,12 @@ package com.example.commonms.config;
 
 import com.example.commonms.model.entity.Airline;
 import com.example.commonms.repository.AirlineRepository;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.List;
 
