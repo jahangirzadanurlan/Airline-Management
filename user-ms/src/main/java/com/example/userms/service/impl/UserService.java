@@ -6,7 +6,7 @@ import com.example.commonsecurity.auth.services.JwtService;
 import com.example.commonsecurity.model.RoleType;
 import com.example.userms.model.dto.request.AdminNewPasswordRequestDto;
 import com.example.userms.model.dto.request.AuthenticationRequest;
-import com.example.userms.model.dto.request.PasswodRequestDto;
+import com.example.userms.model.dto.request.PasswordRequestDto;
 import com.example.userms.model.dto.response.AuthenticationResponse;
 import com.example.userms.model.dto.request.UserRequestDto;
 import com.example.userms.model.entity.ConfirmationToken;
@@ -176,23 +176,23 @@ public class UserService implements UserDetailsService,IUserService {
     //----------------------------
 
     @Override
-    public ResponseEntity<String> resetsPassword(String token, PasswodRequestDto passwodRequestDto) {
-        if (passwodRequestDto.getNewPassword().equals(passwodRequestDto.getRepeatPassword())){
-            extractUserAndSetPassword(token, passwodRequestDto);
+    public ResponseEntity<String> resetsPassword(String token, PasswordRequestDto passwordRequestDto) {
+        if (passwordRequestDto.getNewPassword().equals(passwordRequestDto.getRepeatPassword())){
+            extractUserAndSetPassword(token, passwordRequestDto);
             return ResponseEntity.status(HttpStatus.ACCEPTED).body("Password changing is successfully!");
         }else {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Password changing is not successfully!");
         }
     }
 
-    private void extractUserAndSetPassword(String token, PasswodRequestDto passwodRequestDto) {
+    private void extractUserAndSetPassword(String token, PasswordRequestDto passwordRequestDto) {
         securityHelper.authHeaderIsValid(token);
         String jwt = token.substring(7);
         if (!jwtService.isTokenExpired(jwt)){
             String username = jwtService.extractUsername(jwt);
             Optional<User> user = userRepository.findUserByUsernameOrEmail(username);
             user.orElseThrow(() -> new RuntimeException("User not Found!"))
-                    .setPassword(passwordEncoder.encode(passwodRequestDto.getNewPassword()));
+                    .setPassword(passwordEncoder.encode(passwordRequestDto.getNewPassword()));
             userRepository.save(user.get());
         }
     }

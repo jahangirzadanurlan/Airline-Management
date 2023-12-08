@@ -60,6 +60,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/common-ms" />
+            <option value="$PROJECT_DIR$/common-security" />
           </set>
         </option>
       </GradleProjectSettings>
