@@ -25,7 +25,9 @@ public class FlightService implements IFlightService {
 
     @Override
     public ResponseEntity<String> addFlight(FlightRequestDto requestDto) {
+        log.info(requestDto.toString());
         Flight flight = modelMapper.map(requestDto, Flight.class);
+        log.info(flight.toString());
         flightRepository.save(flight);
         return ResponseEntity.status(HttpStatus.CREATED).body("Flight save is successfully!");
     }

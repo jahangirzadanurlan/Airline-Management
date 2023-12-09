@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -15,7 +16,7 @@ public class FlightController {
     private final IFlightService flightService;
 
     @PostMapping("/flights")
-    public ResponseEntity<String> addFlight(@RequestBody FlightRequestDto requestDto){
+    public ResponseEntity<String> addFlight(@RequestBody @Valid FlightRequestDto requestDto){
         return flightService.addFlight(requestDto);
     }
 

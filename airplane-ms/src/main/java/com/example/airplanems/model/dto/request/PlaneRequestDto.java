@@ -2,11 +2,13 @@ package com.example.airplanems.model.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 
 @Builder
+@Validated
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
