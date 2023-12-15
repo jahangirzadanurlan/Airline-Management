@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="GradleMigrationSettings" migrationVersion="1" />
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/airplane-ms" />
-        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="gradleJvm" value="jbrsdk-17" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/airplane-ms" />
@@ -15,7 +14,7 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/booking-ms" />
-        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="gradleJvm" value="jbrsdk-17" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/booking-ms" />
@@ -28,7 +27,7 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/common-email" />
-        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="gradleJvm" value="jbrsdk-17" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/common-email" />
@@ -38,7 +37,7 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/common-exception" />
-        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="gradleJvm" value="jbrsdk-17" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/common-exception" />
@@ -47,7 +46,7 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/common-file-generator" />
-        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="gradleJvm" value="jbrsdk-17" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/common-file-generator" />
@@ -56,7 +55,7 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/common-ms" />
-        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="gradleJvm" value="jbrsdk-17" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/common-ms" />
@@ -66,7 +65,7 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/common-notification" />
-        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="gradleJvm" value="jbrsdk-17" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/common-notification" />
@@ -75,7 +74,7 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/common-security" />
-        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="gradleJvm" value="jbrsdk-17" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/common-security" />
@@ -84,7 +83,7 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/flight-ms" />
-        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="gradleJvm" value="jbrsdk-17" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/common-security" />
@@ -94,7 +93,7 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/notification-ms" />
-        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="gradleJvm" value="jbrsdk-17" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/common-email" />
@@ -105,17 +104,8 @@
         </option>
       </GradleProjectSettings>
       <GradleProjectSettings>
-        <option name="externalProjectPath" value="$PROJECT_DIR$/notificationn-ms" />
-        <option name="gradleJvm" value="#JAVA_HOME" />
-        <option name="modules">
-          <set>
-            <option value="$PROJECT_DIR$/notificationn-ms" />
-          </set>
-        </option>
-      </GradleProjectSettings>
-      <GradleProjectSettings>
         <option name="externalProjectPath" value="$PROJECT_DIR$/user-ms" />
-        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="gradleJvm" value="jbrsdk-17" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/common-email" />
