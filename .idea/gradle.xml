@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
   <component name="GradleSettings">
     <option name="linkedExternalProjectsSettings">
       <GradleProjectSettings>
@@ -8,6 +9,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/airplane-ms" />
+            <option value="$PROJECT_DIR$/common-exception" />
             <option value="$PROJECT_DIR$/common-security" />
           </set>
         </option>
@@ -19,6 +21,7 @@
           <set>
             <option value="$PROJECT_DIR$/booking-ms" />
             <option value="$PROJECT_DIR$/common-email" />
+            <option value="$PROJECT_DIR$/common-exception" />
             <option value="$PROJECT_DIR$/common-file-generator" />
             <option value="$PROJECT_DIR$/common-notification" />
             <option value="$PROJECT_DIR$/common-security" />
@@ -58,6 +61,7 @@
         <option name="gradleJvm" value="jbrsdk-17" />
         <option name="modules">
           <set>
+            <option value="$PROJECT_DIR$/common-exception" />
             <option value="$PROJECT_DIR$/common-ms" />
             <option value="$PROJECT_DIR$/common-security" />
           </set>
@@ -86,6 +90,7 @@
         <option name="gradleJvm" value="jbrsdk-17" />
         <option name="modules">
           <set>
+            <option value="$PROJECT_DIR$/common-exception" />
             <option value="$PROJECT_DIR$/common-security" />
             <option value="$PROJECT_DIR$/flight-ms" />
           </set>
@@ -109,6 +114,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/common-email" />
+            <option value="$PROJECT_DIR$/common-exception" />
             <option value="$PROJECT_DIR$/common-notification" />
             <option value="$PROJECT_DIR$/common-security" />
             <option value="$PROJECT_DIR$/user-ms" />

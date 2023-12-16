@@ -27,6 +27,7 @@ ext {
 
 dependencies {
     implementation project(":common-security")
+    implementation project(":common-exception")
 
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'

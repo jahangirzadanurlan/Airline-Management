@@ -1,12 +1,14 @@
-package com.example.airplanems.model.dto.response;
+package com.example.commonexception.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,15 +32,4 @@ public class ExceptionResponse {
                 .build();
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public HttpStatus getHttpStatus() {
-        return httpStatus;
-    }
-
-    public LocalDateTime getResponseTime() {
-        return responseTime;
-    }
 }

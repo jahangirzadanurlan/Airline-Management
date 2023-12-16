@@ -1,5 +1,7 @@
 package com.example.flightms.service.impl;
 
+import com.example.commonexception.enums.ExceptionsEnum;
+import com.example.commonexception.exceptions.GeneralException;
 import com.example.flightms.model.dto.request.FlightRequestDto;
 import com.example.flightms.model.dto.response.FlightResponseDto;
 import com.example.flightms.model.entity.Flight;
@@ -51,19 +53,19 @@ public class FlightService implements IFlightService {
     @Override
     public double getFlightPrice(Long flightId) {
         Optional<Flight> flight = flightRepository.findById(flightId);
-        flight.orElseThrow(() -> new RuntimeException("Flight not found"));
+        flight.orElseThrow(() -> new GeneralException(ExceptionsEnum.FLIGHT_NOT_FOUND));
         return flight.get().getInitialPrice() + (flight.get().getInitialPrice() * (flight.get().getTicketIncreasePercentBYSeatsCount() + Flight.ticketIncreasePercentBYSaleTicketCount)) / 100;
     }
 
     @Override
     public FlightResponseDto getFlightById(Long id) {
-        return modelMapper.map(flightRepository.findById(id).orElseThrow(() -> new RuntimeException("Flight not found!")),FlightResponseDto.class);
+        return modelMapper.map(flightRepository.findById(id).orElseThrow(() -> new GeneralException(ExceptionsEnum.FLIGHT_NOT_FOUND)),FlightResponseDto.class);
     }
 
     @Override
     public ResponseEntity<String> updateFlight(Long id,FlightRequestDto requestDto) {
         Optional<Flight> flightById = flightRepository.findById(id);
-        flightById.orElseThrow(() -> new RuntimeException("Flight not found!")).setAirplaneId(requestDto.getAirplaneId());
+        flightById.orElseThrow(() -> new GeneralException(ExceptionsEnum.FLIGHT_NOT_FOUND)).setAirplaneId(requestDto.getAirplaneId());
         flightById.get().setInitialPrice(requestDto.getInitialPrice());
         flightById.get().setFromAirlineId(requestDto.getFromAirlineId());
         flightById.get().setDepartureDateTime(requestDto.getDepartureDateTime());
@@ -76,7 +78,7 @@ public class FlightService implements IFlightService {
 
     @Override
     public ResponseEntity<String> deleteFlight(Long id) {
-        flightRepository.findById(id).orElseThrow(() -> new RuntimeException("Flight not found!"));
+        flightRepository.findById(id).orElseThrow(() -> new GeneralException(ExceptionsEnum.FLIGHT_NOT_FOUND));
         flightRepository.deleteById(id);
         return ResponseEntity.ok().body("Deleting is successfully!");
     }
@@ -86,7 +88,7 @@ public class FlightService implements IFlightService {
         Optional<Flight> flight = flightRepository.findById(id);
 
         if (isFly.equalsIgnoreCase("true") || isFly.equalsIgnoreCase("false")){
-            flight.orElseThrow(() -> new RuntimeException("Plane not found!"))
+            flight.orElseThrow(() -> new GeneralException(ExceptionsEnum.PLANE_NOT_FOUND))
                     .setFly(isFly.equalsIgnoreCase("true"));
             flightRepository.save(flight.get());
             return ResponseEntity.ok().body("Flight updated!");

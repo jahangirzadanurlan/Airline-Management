@@ -1,6 +1,6 @@
-package com.example.airplanems.exceptions;
+package com.example.commonexception.exceptions;
 
-import com.example.airplanems.model.enums.ExceptionsEnum;
+import com.example.commonexception.enums.ExceptionsEnum;
 import lombok.Getter;
 
 @Getter

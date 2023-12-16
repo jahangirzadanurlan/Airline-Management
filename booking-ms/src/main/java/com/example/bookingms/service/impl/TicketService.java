@@ -9,12 +9,12 @@ import com.example.bookingms.repository.TicketRepository;
 import com.example.bookingms.service.AirplaneClient;
 import com.example.bookingms.service.FlightClient;
 import com.example.bookingms.service.ITicketService;
+import com.example.commonexception.enums.ExceptionsEnum;
+import com.example.commonexception.exceptions.GeneralException;
 import com.example.commonfilegenerator.service.PdfGeneratorService;
 import com.example.commonnotification.dto.request.KafkaRequest;
 import com.example.commonsecurity.auth.SecurityHelper;
 import com.example.commonsecurity.auth.services.JwtService;
-import com.itextpdf.text.*;
-import com.itextpdf.text.pdf.PdfWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -24,9 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -58,7 +56,7 @@ public class TicketService implements ITicketService {
         String username = getUsernameInHeader(authHeader);
 
         return modelMapper.map(ticketRepository.findByIdAndUsername(id,username)
-                .orElseThrow(() -> new RuntimeException("Ticket not found!")), TicketResponseDto.class);
+                .orElseThrow(() -> new GeneralException(ExceptionsEnum.TICKET_NOT_FOUND)), TicketResponseDto.class);
     }
 
     @Override
@@ -66,15 +64,18 @@ public class TicketService implements ITicketService {
         String username = getUsernameInHeader(authHeader);
         double flightPrice = getFlightPrice(flightId); //exception
         FlightResponseDto flightDto = flightClient.getFlightById(flightId);
+        if (flightDto == null){
+            throw new GeneralException(ExceptionsEnum.FLIGHT_NOT_FOUND);
+        }
 
         log.info("flightDto.getAirplaneId() => {}",flightDto.getAirplaneId());
         PlaneResponseDto airplane = airplaneClient.getAirplaneById(flightDto.getAirplaneId());
         if (requestDto.getPlaneSeatNumber() > airplane.getMasSeats()){
-            throw new RuntimeException("There is no such seat number");
+            throw new GeneralException(ExceptionsEnum.SEAT_NUMBER_NOT_FOUND);
         }
 
         if (ticketRepository.findByPlaneSeatNumber(requestDto.getPlaneSeatNumber()).isPresent()){
-            throw new RuntimeException("This seat already taken");
+            throw new GeneralException(ExceptionsEnum.SEAT_NUMBER_NOT_AVAILABLE);
         }
 
         createAndSaveTicket(username,requestDto, flightDto,flightPrice);
@@ -122,7 +123,7 @@ public class TicketService implements ITicketService {
 
     public String getUsernameInHeader(String authHeader){
         if (!securityHelper.authHeaderIsValid(authHeader)){
-            throw new RuntimeException("Authorization header not true!");
+            throw new GeneralException(ExceptionsEnum.AUTH_HEADER_NOT_TRUE);
         }
         String jwtToken=authHeader.substring(7);
 
@@ -134,8 +135,8 @@ public class TicketService implements ITicketService {
         Optional<Ticket> ticket = ticketRepository.findById(ticketId);
 
         String username = getUsernameInHeader(authHeader);
-        if (!username.equals(ticket.orElseThrow(() -> new RuntimeException("Ticket not found!")).getUsername())){
-            throw new RuntimeException("Unauthenticated request!");
+        if (!username.equals(ticket.orElseThrow(() -> new GeneralException(ExceptionsEnum.TICKET_NOT_FOUND)).getUsername())){
+            throw new GeneralException(ExceptionsEnum.UNAUTHENTICATED_REQUEST);
         }
 
         String content = ticket.get().getFirstName() + " " + ticket.get().getLastName() + " your fromAirlineId=>" +
@@ -150,7 +151,7 @@ public class TicketService implements ITicketService {
         if (pdfContent != null) {
             contentLength = pdfContent.length;
         }else {
-            throw new RuntimeException("Pdf content is null!");
+            throw new GeneralException(ExceptionsEnum.PDF_CONTENT_IS_NULL);
         }
 
         // Dosyanın içeriğini temsil eden bir InputStreamResource oluşturun

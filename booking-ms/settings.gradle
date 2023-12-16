@@ -3,7 +3,9 @@ include 'common-email'
 include 'common-notification'
 include 'common-security'
 include 'common-file-generator'
+include 'common-exception'
 
+project(':common-exception').projectDir = new File(settingsDir, '../common-exception')
 project(':common-file-generator').projectDir = new File(settingsDir, '../common-file-generator')
 project(':common-notification').projectDir = new File(settingsDir, '../common-notification')
 project(':common-email').projectDir = new File(settingsDir, '../common-email')

@@ -4,6 +4,8 @@ import com.example.airplanems.model.dto.request.PlaneRequestDto;
 import com.example.airplanems.model.entity.Plane;
 import com.example.airplanems.repository.PlaneRepository;
 import com.example.airplanems.service.IPlaneService;
+import com.example.commonexception.enums.ExceptionsEnum;
+import com.example.commonexception.exceptions.GeneralException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -43,12 +45,12 @@ public class PlaneService implements IPlaneService {
 
     @Override
     public Plane getPlaneById(Long id) {
-        return planeRepository.findById(id).orElseThrow(() -> new RuntimeException("Plane not found!"));
+        return planeRepository.findById(id).orElseThrow(() -> new GeneralException(ExceptionsEnum.PLANE_NOT_FOUND));
     }
 
     @Override
     public ResponseEntity<String> updatePlane(Plane plane) {
-        planeRepository.findById(plane.getId()).orElseThrow(() -> new RuntimeException("Plane not found!"));
+        planeRepository.findById(plane.getId()).orElseThrow(() -> new GeneralException(ExceptionsEnum.PLANE_NOT_FOUND));
         planeRepository.save(plane);
         return ResponseEntity.ok().body(plane.getName() + " updated");
     }
@@ -56,7 +58,7 @@ public class PlaneService implements IPlaneService {
     @Override
     public ResponseEntity<String> deletePlane(Long id) {
         Optional<Plane> plane = planeRepository.findById(id);
-        planeRepository.delete(plane.orElseThrow(() -> new RuntimeException("Plane not found")));
+        planeRepository.delete(plane.orElseThrow(() -> new GeneralException(ExceptionsEnum.PLANE_NOT_FOUND)));
         return ResponseEntity.ok().body(plane.get().getName() + " plane deleted!");
     }
 
@@ -65,7 +67,7 @@ public class PlaneService implements IPlaneService {
         Optional<Plane> plane = planeRepository.findById(id);
 
         if (isBusy.equalsIgnoreCase("true") || isBusy.equalsIgnoreCase("false")){
-            plane.orElseThrow(() -> new RuntimeException("Plane not found!"))
+            plane.orElseThrow(() -> new GeneralException(ExceptionsEnum.PLANE_NOT_FOUND))
                     .setBusy(isBusy.equalsIgnoreCase("true"));
             planeRepository.save(plane.get());
             return ResponseEntity.ok().body("Plane updated!");

@@ -1,5 +1,7 @@
 package com.example.userms.service.impl;
 
+import com.example.commonexception.enums.ExceptionsEnum;
+import com.example.commonexception.exceptions.GeneralException;
 import com.example.commonnotification.dto.request.KafkaRequest;
 import com.example.commonsecurity.auth.SecurityHelper;
 import com.example.commonsecurity.auth.services.JwtService;
@@ -66,7 +68,7 @@ public class UserService implements UserDetailsService,IUserService {
     @Override
     public String saveUser(UserRequestDto request) {
         Role role = roleRepository.findRoleByName(RoleType.USER)
-                .orElseThrow(() -> new RuntimeException("Role not found!"));
+                .orElseThrow(() -> new GeneralException(ExceptionsEnum.ROLE_NOT_FOUND));
         saveUserToDatabase(request, role,"confirm-topic");
         log.info("{} -> user created",request.getUsername());
         return Constant.SAVE_IS_SUCCESSFULLY.getMessage();
@@ -75,7 +77,7 @@ public class UserService implements UserDetailsService,IUserService {
     @Override
     public String saveAdmin(UserRequestDto request) {
         Role role = roleRepository.findRoleByName(RoleType.ADMIN)
-                .orElseThrow(() -> new RuntimeException("Role not found!"));
+                .orElseThrow(() -> new GeneralException(ExceptionsEnum.ROLE_NOT_FOUND));
         saveUserToDatabase(request, role,"set-psw-topic");
         log.info("{} -> admin created",request.getUsername());
         return Constant.SAVE_IS_SUCCESSFULLY.getMessage();
@@ -107,13 +109,13 @@ public class UserService implements UserDetailsService,IUserService {
                     )
             );
         } catch (AuthenticationException e) {
-            log.error("Authentication failed: {}", e.getMessage());//Userin aktiv olub olmamağını haradan bilir?
+            log.error("Authentication failed: {}", e.getMessage());
             throw new RuntimeException(e);
         }
 
         Optional<User> user = userRepository.findUserByUsernameOrEmail(request.getUsername());
 
-        String accessToken=jwtService.generateToken(user.orElseThrow());
+        String accessToken=jwtService.generateToken(user.orElseThrow(() -> new GeneralException(ExceptionsEnum.USER_NOT_FOUND)));
         String refreshToken=jwtService.generateRefreshToken(user.orElseThrow());
 
         log.info("{} -> user loging",request.getUsername());
@@ -135,7 +137,7 @@ public class UserService implements UserDetailsService,IUserService {
             String otp = createAndSaveOtp(user);
 
             KafkaRequest kafkaRequest = KafkaRequest.builder()
-                    .email(user.orElseThrow(() -> new RuntimeException("Token not found!")).getEmail())
+                    .email(user.orElseThrow(() -> new GeneralException(ExceptionsEnum.Token_NOT_FOUND)).getEmail())
                     .token(otp)
                     .build();
             kafkaTemplate.send("otp-topic",kafkaRequest);
@@ -151,7 +153,7 @@ public class UserService implements UserDetailsService,IUserService {
 
         ConfirmationToken confirmationToken = ConfirmationToken.builder()
                 .token(otp)
-                .user(user.orElseThrow(() -> new RuntimeException("User not found!")))
+                .user(user.orElseThrow(() -> new GeneralException(ExceptionsEnum.USER_NOT_FOUND)))
                 .createdAt(LocalDateTime.now())
                 .build();
         confirmationTokenRepository.save(confirmationToken);
@@ -162,7 +164,7 @@ public class UserService implements UserDetailsService,IUserService {
     public ResponseEntity<String> checkOtp(String username,String otp) {
         Optional<User> user = userRepository.findUserByUsernameOrEmail(username);
         if (user.isEmpty()){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Username not found!");
+            throw new GeneralException(ExceptionsEnum.USERNAME_NOT_FOUND);
         }
 
         Optional<ConfirmationToken> confirmationToken = confirmationTokenRepository.findConfirmationTokenByToken(otp);
@@ -191,7 +193,7 @@ public class UserService implements UserDetailsService,IUserService {
         if (!jwtService.isTokenExpired(jwt)){
             String username = jwtService.extractUsername(jwt);
             Optional<User> user = userRepository.findUserByUsernameOrEmail(username);
-            user.orElseThrow(() -> new RuntimeException("User not Found!"))
+            user.orElseThrow(() -> new GeneralException(ExceptionsEnum.USER_NOT_FOUND))
                     .setPassword(passwordEncoder.encode(passwordRequestDto.getNewPassword()));
             userRepository.save(user.get());
         }
@@ -208,14 +210,14 @@ public class UserService implements UserDetailsService,IUserService {
             kafkaTemplate.send("email-topic",kafkaRequest);
             return ResponseEntity.ok().body("We send link to your email for password changing");
         }else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("This email not registered!");
+            throw new GeneralException(ExceptionsEnum.EMAIL_NOT_REGISTERED);
         }
     }
 
     @Override
     public AuthenticationResponse refreshToken(String token, Long id) {
         if (!securityHelper.authHeaderIsValid(token)){
-            throw new RuntimeException("Token is wrong!");//
+            throw new GeneralException(ExceptionsEnum.TOKEN_IS_WRONG);
         }
 
         String jwt = token.substring(7);
@@ -223,7 +225,7 @@ public class UserService implements UserDetailsService,IUserService {
         Optional<User> userById = userRepository.findUserById(id);
 
         if (username != null){
-            if (userById.orElseThrow(() -> new RuntimeException(id + " id User not found!"))
+            if (userById.orElseThrow(() -> new GeneralException(ExceptionsEnum.USER_NOT_FOUND))
                     .getUsername().equals(username)){
                 if(jwtService.isTokenValid(jwt,userById.orElseThrow())){
                     String accessToken=jwtService.generateToken(userById.get());
@@ -231,16 +233,16 @@ public class UserService implements UserDetailsService,IUserService {
 
                     log.info("{} token refreshing is successfully",username);
                     return AuthenticationResponse.builder()
-                            .message("Refreshingg is successfully!")
+                            .message("Refreshing is successfully!")
                             .accessToken(accessToken)
                             .refreshToken(refreshToken)
                             .build();
                 }
             }else {
-                throw new RuntimeException("UserId is wrong!");
+                throw new GeneralException(ExceptionsEnum.USER_ID_IS_WRONG);
             }
         }else {
-            throw new RuntimeException("Token Username is null!");
+            throw new GeneralException(ExceptionsEnum.USERNAME_IS_NULL);
         }
         return null;
     }
@@ -277,7 +279,7 @@ public class UserService implements UserDetailsService,IUserService {
             enableAdminAccount(requestDto.getToken(),requestDto.getNewPassword());
             return "Your account has been activated!";
         }else {
-            throw new RuntimeException("Passwords not equals");
+            throw new GeneralException(ExceptionsEnum.PASSWORDS_IS_NOT_EQUALS);
         }
     }
 
@@ -285,7 +287,7 @@ public class UserService implements UserDetailsService,IUserService {
         Optional<ConfirmationToken> confirmationToken = confirmationTokenRepository.findConfirmationTokenByToken(token);
         Optional<User> user = userRepository.findUserByUsernameOrEmail(confirmationToken.orElseThrow(() -> new RuntimeException("Token not found!"))
                                                                                 .getUser().getUsername());
-        user.orElseThrow(() -> new RuntimeException("User not found!"))
+        user.orElseThrow(() -> new GeneralException(ExceptionsEnum.USER_NOT_FOUND))
                 .setEnabled(true);
         confirmationToken.get().setConfirmedAt(LocalDateTime.now());
 
@@ -297,7 +299,7 @@ public class UserService implements UserDetailsService,IUserService {
         Optional<ConfirmationToken> confirmationToken = confirmationTokenRepository.findConfirmationTokenByToken(token);
         Optional<User> user = userRepository.findUserByUsernameOrEmail(confirmationToken.orElseThrow(() -> new RuntimeException("Token not found!"))
                                                                             .getUser().getUsername());
-        user.orElseThrow(() -> new RuntimeException("User not found!"))
+        user.orElseThrow(() -> new GeneralException(ExceptionsEnum.USER_NOT_FOUND))
                 .setEnabled(true);
         user.get().setPassword(passwordEncoder.encode(password));
         confirmationToken.get().setConfirmedAt(LocalDateTime.now());
@@ -311,7 +313,7 @@ public class UserService implements UserDetailsService,IUserService {
         Optional<ConfirmationToken> confirmationToken = confirmationTokenRepository.findConfirmationTokenByToken(token);
         Optional<User> user = userRepository.findUserByUsernameOrEmail(confirmationToken.orElseThrow(() -> new RuntimeException("Token not found!"))
                                                                             .getUser().getUsername());
-        user.orElseThrow(() -> new RuntimeException("User not found!"))
+        user.orElseThrow(() -> new GeneralException(ExceptionsEnum.USER_NOT_FOUND))
                 .setEnabled(true);
 
         return user.get().getUsername() + " plese send POST request to '/auth/set-password' link!";

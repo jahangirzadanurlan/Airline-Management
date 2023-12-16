@@ -1,4 +1,4 @@
-package com.example.airplanems.handler;
+package com.example.userms.handler;
 
 import com.example.commonexception.enums.ExceptionsEnum;
 import com.example.commonexception.exceptions.GeneralException;
@@ -6,13 +6,13 @@ import com.example.commonexception.response.ExceptionResponse;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.validation.constraints.NotNull;
-import org.springframework.validation.BindException;
 
 @RestControllerAdvice
 public class GlobalHandler extends DefaultErrorAttributes {
