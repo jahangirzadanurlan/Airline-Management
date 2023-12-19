@@ -2,7 +2,7 @@ spring:
   datasource:
     username: postgres
     password: root
-    url: jdbc:postgresql://localhost:5432/product
+    url: jdbc:postgresql://localhost:5432/user
   jpa:
     hibernate:
       ddl-auto: update
